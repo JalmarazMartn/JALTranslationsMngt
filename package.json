@@ -1,0 +1,73 @@
+{
+	"name": "jal-translations-mngt",
+	"displayName": "JAL Translations Mngt",
+	"description": "Manage xlf translation files for AL BC Central",
+	"publisher": "JessAlmarazMartin",	
+	"version": "0.0.1",
+	"repository": "https://github.com/JalmarazMartn/JALTranslationsMngt/",
+	"engines": {
+		"vscode": "^1.46.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onCommand:JAMALUtilities.BeginTrans",
+		"onCommand:JAMALUtilities.LoadPreviousTrans",
+		"onCommand:JAMALUtilities.EditTrans",
+		"onCommand:JAMALUtilities.SaveTrans"
+	],
+	"main": "./extension.js",
+	"contributes": {
+		"configuration": {
+			"title": "JAL Translations management",
+			"properties": {
+				"JSONTranslationFilename": {
+					"type": "string",
+					"default": "JSONTranslation.json",
+					"description": "Temporal translation file"
+				},
+				"TargetLanguage": {
+					"type": "string",
+					"default": "es-ES",
+					"description": "Temporal translation file"
+				}
+			}
+		},
+		"commands": [
+			{
+				"command": "JAMALUtilities.BeginTrans",
+				"title": "JAM Translation Step 1: Begin translation loading original xlf file"
+			},
+			{
+				"command": "JAMALUtilities.LoadPreviousTrans",
+				"title": "JAM Translation Step 2: Load previous translation Xlf files (n times)"
+			},
+			{
+				"command": "JAMALUtilities.EditTrans",
+				"title": "JAM Translation Step 3: Edit traslation"
+			},
+			{
+				"command": "JAMALUtilities.SaveTrans",
+				"title": "JAM Translation Step 4: Save traslation and create here the destination xlf file"
+			}
+		]
+
+	},
+	"scripts": {
+		"lint": "eslint .",
+		"pretest": "npm run lint",
+		"test": "node ./test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.46.0",
+		"@types/glob": "^7.1.3",
+		"@types/mocha": "^8.0.0",
+		"@types/node": "^14.0.27",
+		"eslint": "^7.6.0",
+		"glob": "^7.1.6",
+		"mocha": "^8.1.3",
+		"typescript": "^4.0.2",
+		"vscode-test": "^1.4.0"
+	}
+}
