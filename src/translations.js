@@ -2,17 +2,6 @@ const vscode = require('vscode');
 const TargetLabel = 'Target==>';
 const RexRemoveLabels = /\s*(<target.*?>|<source>)(\s*.*)(<\/target>|<\/source>)/gm;
 const RexLanguageLine = /(source-language=".*"\s*target-language=")([a-z\-]*)(")/gmi;
-const HtmlStartTagSource = '<td>';
-const HtmlStartTagTarget = '<td><div contenteditable="">';
-const HtmlEndTagSource = '</td>';
-const HtmlEndTagTarget = '</div></td>';
-const UngreedySreachPattern = '(.*?)';
-const TableRowsPattern = 
-EscapeRegExp(HtmlStartTagSource)+ UngreedySreachPattern
-+EscapeRegExp(HtmlEndTagSource)
-+EscapeRegExp(HtmlStartTagTarget)+UngreedySreachPattern
-+EscapeRegExp(HtmlEndTagTarget)	
-;
 
 //
 module.exports = {
@@ -26,14 +15,16 @@ module.exports = {
 	},
 	EditTranslation: function () { BeginEditTranslation() },
 	SaveTranslation: function () { SaveTranslationToJsonAndCreateTranslationXlf()},
-	GetTranslationsHtml: function() {return GetTranslationsHtml()},
-	EditHtmlTranslation: function(context) {EditHtmlTranslation(context)}	
+	ReadJSONTransFile: function(JSONTrans){return ReadJSONTransFile(JSONTrans)},
+	SaveJSONTransfile: function(JSONTrans){SaveJSONTransfile(JSONTrans)},
+	WriteNewXlfFile: function(NewTitle = '',){WriteNewXlfFile(NewTitle)}
+
 }
 async function CreateTranslationJSON() {
 
 	var JSONTrans = [];
 	DeleteJSONTransFile();
-	JSONTrans = await ProcessXlfFile('Select xlf file auto generated ENG', JSONTrans);	
+	JSONTrans = await AskAndProcessXlfFile('Select xlf file auto generated ENG', JSONTrans);	
 	//JSONTrans = await ProcessXlfFilePreviousTrans('Select xlf file previous translation', JSONTrans);	
 	SaveJSONTransfile(JSONTrans);
 };
@@ -41,10 +32,10 @@ async function LoadPreviousTranslation() {
 
 	var JSONTrans = [];
 	JSONTrans = ReadJSONTransFile(JSONTrans);
-	ProcessXlfFilePreviousTrans('Select xlf file previous translation', JSONTrans);	
+	AskAndProcessXlfFilePreviousTrans('Select xlf file previous translation', JSONTrans);	
 };
 
-async function ProcessXlfFile(newtitle, JSONTrans) {
+async function AskAndProcessXlfFile(newtitle, JSONTrans) {
 	const options = {
 		canSelectMany: false,
 		openLabel: 'Open',
@@ -54,14 +45,19 @@ async function ProcessXlfFile(newtitle, JSONTrans) {
 		}
 	};
 	let fileUri = await vscode.window.showOpenDialog(options);
-	let XlfDoc = await vscode.workspace.openTextDocument(fileUri[0].fsPath);
-	SetEngFileName(JSONTrans,fileUri[0].fsPath);
+	SetEngFileName(JSONTrans,fileUri[0].fsPath);	
+	return await ProcessXlfFile(fileUri[0].fsPath,JSONTrans);
+}
+async function ProcessXlfFile(FilePath = '',JSONTrans)
+{
+	let XlfDoc = await vscode.workspace.openTextDocument(FilePath);
 	var LastSourceText = '';
 	for (var i = 0; i < XlfDoc.lineCount; i++) {
 		var line = XlfDoc.lineAt(i);
 		LastSourceText = WriteJSONTrans(line.text, JSONTrans, LastSourceText);
 	}
 	return (JSONTrans);
+
 }
 function WriteJSONTrans(linetext, JSONTrans, LastSourceText) {
 	if (linetext.match('<source>')) {
@@ -81,7 +77,7 @@ function WriteJSONTrans(linetext, JSONTrans, LastSourceText) {
 	}
 	return (LastSourceText);
 }
-async function ProcessXlfFilePreviousTrans(newtitle, JSONTrans) {
+async function AskAndProcessXlfFilePreviousTrans(newtitle, JSONTrans) {
 	const options = {
 		canSelectMany: false,
 		openLabel: 'Open',
@@ -91,12 +87,16 @@ async function ProcessXlfFilePreviousTrans(newtitle, JSONTrans) {
 		}
 	};
 	let fileUri = await vscode.window.showOpenDialog(options);
-    vscode.window.showInformationMessage('Processing file:' + fileUri[0].fsPath,{modal:false},'Got it');		
+	ProcessXlfFilePreviousTrans(fileUri[0].fsPath,JSONTrans)
+}
+async function ProcessXlfFilePreviousTrans(FilePath='',JSONTrans)
+{
+	vscode.window.showInformationMessage('Processing file:' + FilePath,{modal:false},'Got it');		
     var fs = require('fs'),
         readline = require('readline');
 
     var rd = readline.createInterface({
-        input: fs.createReadStream(fileUri[0].fsPath)
+        input: fs.createReadStream(FilePath)
     });
 	let CountLines = 0;    
 	var LastSourceText = '';	
@@ -315,107 +315,6 @@ async function ErrorIfNotEmptyDoc()
 
 	return false;
 }
-function EditHtmlTranslation(context)
-{
-    const WebviewTranslations = vscode.window.createWebviewPanel(
-		'Translations',
-		'Translations: Set the target and push -Save- when is done',
-		vscode.ViewColumn.One,
-		{
-		  enableScripts: true
-		}
-	  );
-	  WebviewTranslations.webview.onDidReceiveMessage(
-		message => {
-		  switch (message.command) {
-			case 'Save':
-				SaveHtmlTranslation(message.text);
-				WebviewTranslations.dispose();
-			  return;
-
-			}
-        },
-        undefined,
-        context.subscriptions      
-	);
-WebviewTranslations.webview.html = GetTranslationsHtml();	
-}
-function GetTranslationsHtml()
-{
-	let FinalTable = '';
-	FinalTable = 
-	`
-	<body>
-	<table id="table" style="width:100%">
-  <th>Source</th><th>Target</th>`
- + GetHtmlTableContent() +
-  `</table>	
-  <br></br>
-  <Button onclick="Save()">Save and close</Button>
-  <Script>
-  function Save() {
-      //document.getElementById('Target1').innerHTML = document.getElementById('Source1').innerHTML;
-      const vscode = acquireVsCodeApi();
-    vscode.postMessage({
-      command: "Save",
-      text: document.getElementById('table').innerHTML
-    });
-	}
-  </Script>
-  </body>
-  </html>   	
-	`
-	return FinalTable;
-}
-function GetHtmlTableContent()
-{
-	let HtmlTableContent = '';	
-	var JSONTrans = [];
-	JSONTrans = ReadJSONTransFile(JSONTrans);	
-	for (var i = 0; i < JSONTrans.length; i++) {		
-		var element = JSONTrans[i];
-		if ((element.target == '') ||(element.target == element.source)) {
-			HtmlTableContent = HtmlTableContent + 
-			'<tr>' +
-			String.prototype.concat(
-			HtmlStartTagSource,
-			element.source) +
-			HtmlEndTagSource +
-			String.prototype.concat(			
-			HtmlStartTagTarget
-			,element.source) +
-			HtmlEndTagTarget +
-			'</tr>';
-		}
-	}
-	return HtmlTableContent;
-}
-function SaveHtmlTranslation(HtmlTranslation = '')
-{
-	const TableRowsRegExp = new RegExp(TableRowsPattern,'gm');
-	const RowsMatches = HtmlTranslation.match(TableRowsRegExp);
-	if (!RowsMatches)
-	{
-		return;
-	}
-	var JSONTrans = [];
-	JSONTrans = ReadJSONTransFile(JSONTrans);
-	for (var i = 0; i < Object.keys(RowsMatches).length; i++) {
-		UpdateTranslationWithHtmlRow(RowsMatches[i],JSONTrans);
-	}		
-	SaveJSONTransfile(JSONTrans);	
-	WriteNewXlfFile('Select xlf file',);	
-}
-function UpdateTranslationWithHtmlRow(HtmlRow='',JSONTrans = [])
-{
-	const TableRowsRegExp = new RegExp(TableRowsPattern,'');
-	let SingleMatch = HtmlRow.match(TableRowsRegExp);
-	var JSONSource = JSONTrans.find(Obj => Obj.source == SingleMatch[1]);
-	JSONSource.target = SingleMatch[2];	
-}
-function EscapeRegExp(string) {
-	return string.replace(/[.*+\-?^${}()|[\]\\\/]/g,'\\$&'); // $& significa toda la cadena coincidente
-  }
 function SetEngFileName(JSONTrans,EngFileName='')
 {
 	JSONTrans.push(

@@ -1,0 +1,11 @@
+{
+    "Comment" : "General template",
+    "OriginalXlfFile" : "OriginalFile.xlf",
+    "PreviousTranslationsFiles":
+    [
+        {"Path":""},
+        {"Path":""}
+    ],
+    "RemainigTranslationsCSV":"RemTrFile.csv",
+    "FinalXlfFile":"EspFile.xlf"
+}
