@@ -25,7 +25,6 @@ async function CreateTranslationJSON() {
 	var JSONTrans = [];
 	DeleteJSONTransFile();
 	await AskAndProcessXlfFile('Select xlf file auto generated ENG', JSONTrans);	
-	//JSONTrans = await ProcessXlfFilePreviousTrans('Select xlf file previous translation', JSONTrans);		
 };
 async function LoadPreviousTranslation() {
 
@@ -45,7 +44,8 @@ async function AskAndProcessXlfFile(newtitle, JSONTrans) {
 	};
 	let fileUri = await vscode.window.showOpenDialog(options);
 	SetEngFileName(JSONTrans,fileUri[0].fsPath);	
-	await ProcessXlfFile(fileUri[0].fsPath,JSONTrans);
+	//await ProcessXlfFile(fileUri[0].fsPath,JSONTrans);
+	await ProcessXlfFilePreviousTrans(fileUri[0].fsPath,JSONTrans,WriteJSONTrans);
 }
 async function AskAndProcessXlfFilePreviousTrans(newtitle, JSONTrans) {
 	const options = {
@@ -57,20 +57,9 @@ async function AskAndProcessXlfFilePreviousTrans(newtitle, JSONTrans) {
 		}
 	};
 	let fileUri = await vscode.window.showOpenDialog(options);
-	ProcessXlfFilePreviousTrans(fileUri[0].fsPath,JSONTrans)
+	ProcessXlfFilePreviousTrans(fileUri[0].fsPath,JSONTrans,WriteJSONPeviousTrans)
 }
-async function ProcessXlfFile(FilePath = '',JSONTrans)
-{
-	let XlfDoc = await vscode.workspace.openTextDocument(FilePath);
-	var LastSourceText = '';
-	for (var i = 0; i < XlfDoc.lineCount; i++) {
-		var line = XlfDoc.lineAt(i);
-		LastSourceText = WriteJSONTrans(line.text, JSONTrans, LastSourceText);
-	}
-	SaveJSONTransfile(JSONTrans);
-
-}
-async function ProcessXlfFilePreviousTrans(FilePath='',JSONTrans)
+async function ProcessXlfFilePreviousTrans(FilePath='',JSONTrans,FunctionProcLine)
 {
 	vscode.window.showInformationMessage('Processing file:' + FilePath,{modal:false},'Got it');		
     var fs = require('fs'),
@@ -83,7 +72,7 @@ async function ProcessXlfFilePreviousTrans(FilePath='',JSONTrans)
 	var LastSourceText = '';	
     rd.on('line', function (line) {
 		CountLines = CountLines + 1;
-		LastSourceText = WriteJSONPeviousTrans(line, JSONTrans, LastSourceText);		
+		LastSourceText = FunctionProcLine(line, JSONTrans, LastSourceText);		
     });
     rd.on('close',function (){
 		DeleteJSONTransFile();	
