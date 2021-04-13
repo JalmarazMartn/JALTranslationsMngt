@@ -85,7 +85,7 @@ async function ProcessXlfFilePreviousTrans(FilePath='',JSONTrans)
 		CountLines = CountLines + 1;
 		LastSourceText = WriteJSONPeviousTrans(line, JSONTrans, LastSourceText);		
     });
-    rd.on('close',function () {
+    rd.on('close',function (){
 		DeleteJSONTransFile();	
 		SaveJSONTransfile(JSONTrans);		
         vscode.window.showInformationMessage('File ended. File lines: ' + CountLines.toString());
