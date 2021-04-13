@@ -24,9 +24,8 @@ async function CreateTranslationJSON() {
 
 	var JSONTrans = [];
 	DeleteJSONTransFile();
-	JSONTrans = await AskAndProcessXlfFile('Select xlf file auto generated ENG', JSONTrans);	
-	//JSONTrans = await ProcessXlfFilePreviousTrans('Select xlf file previous translation', JSONTrans);	
-	SaveJSONTransfile(JSONTrans);
+	await AskAndProcessXlfFile('Select xlf file auto generated ENG', JSONTrans);	
+	//JSONTrans = await ProcessXlfFilePreviousTrans('Select xlf file previous translation', JSONTrans);		
 };
 async function LoadPreviousTranslation() {
 
@@ -46,36 +45,7 @@ async function AskAndProcessXlfFile(newtitle, JSONTrans) {
 	};
 	let fileUri = await vscode.window.showOpenDialog(options);
 	SetEngFileName(JSONTrans,fileUri[0].fsPath);	
-	return await ProcessXlfFile(fileUri[0].fsPath,JSONTrans);
-}
-async function ProcessXlfFile(FilePath = '',JSONTrans)
-{
-	let XlfDoc = await vscode.workspace.openTextDocument(FilePath);
-	var LastSourceText = '';
-	for (var i = 0; i < XlfDoc.lineCount; i++) {
-		var line = XlfDoc.lineAt(i);
-		LastSourceText = WriteJSONTrans(line.text, JSONTrans, LastSourceText);
-	}
-	return (JSONTrans);
-
-}
-function WriteJSONTrans(linetext, JSONTrans, LastSourceText) {
-	if (linetext.match('<source>')) {
-		var ReplacedLineText = linetext.replace(RexRemoveLabels, GetTranslationText);
-		if (!JSONTrans.find(JSONTrans => JSONTrans.source == ReplacedLineText)) {
-			JSONTrans.push(
-				{
-					"source": ReplacedLineText,
-					"target": ''
-				});
-		}
-		return (linetext.replace(RexRemoveLabels, GetTranslationText));
-	}
-	if (linetext.match('<target>')) {
-		var JSONSource = JSONTrans.find(Obj => Obj.source == LastSourceText);
-		JSONSource.target = linetext.replace(RexRemoveLabels, GetTranslationText);
-	}
-	return (LastSourceText);
+	await ProcessXlfFile(fileUri[0].fsPath,JSONTrans);
 }
 async function AskAndProcessXlfFilePreviousTrans(newtitle, JSONTrans) {
 	const options = {
@@ -88,6 +58,17 @@ async function AskAndProcessXlfFilePreviousTrans(newtitle, JSONTrans) {
 	};
 	let fileUri = await vscode.window.showOpenDialog(options);
 	ProcessXlfFilePreviousTrans(fileUri[0].fsPath,JSONTrans)
+}
+async function ProcessXlfFile(FilePath = '',JSONTrans)
+{
+	let XlfDoc = await vscode.workspace.openTextDocument(FilePath);
+	var LastSourceText = '';
+	for (var i = 0; i < XlfDoc.lineCount; i++) {
+		var line = XlfDoc.lineAt(i);
+		LastSourceText = WriteJSONTrans(line.text, JSONTrans, LastSourceText);
+	}
+	SaveJSONTransfile(JSONTrans);
+
 }
 async function ProcessXlfFilePreviousTrans(FilePath='',JSONTrans)
 {
@@ -105,8 +86,8 @@ async function ProcessXlfFilePreviousTrans(FilePath='',JSONTrans)
 		LastSourceText = WriteJSONPeviousTrans(line, JSONTrans, LastSourceText);		
     });
     rd.on('close',function () {
-		DeleteJSONTransFile();
-		SaveJSONTransfile(JSONTrans);	
+		DeleteJSONTransFile();	
+		SaveJSONTransfile(JSONTrans);		
         vscode.window.showInformationMessage('File ended. File lines: ' + CountLines.toString());
     }
     );	
@@ -127,7 +108,24 @@ function WriteJSONPeviousTrans(linetext, JSONTrans, LastSourceText) {
 	}
 	return (LastSourceText);
 }
-
+function WriteJSONTrans(linetext, JSONTrans, LastSourceText) {
+	if (linetext.match('<source>')) {
+		var ReplacedLineText = linetext.replace(RexRemoveLabels, GetTranslationText);
+		if (!JSONTrans.find(JSONTrans => JSONTrans.source == ReplacedLineText)) {
+			JSONTrans.push(
+				{
+					"source": ReplacedLineText,
+					"target": ''
+				});
+		}
+		return (linetext.replace(RexRemoveLabels, GetTranslationText));
+	}
+	if (linetext.match('<target>')) {
+		var JSONSource = JSONTrans.find(Obj => Obj.source == LastSourceText);
+		JSONSource.target = linetext.replace(RexRemoveLabels, GetTranslationText);
+	}
+	return (LastSourceText);
+}
 // @ts-ignore
 function GetTranslationText(fullMatch = '', startLabel = '', content = '', endLabel = '') {
 	return (content);
