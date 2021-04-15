@@ -17,8 +17,18 @@ module.exports = {
 	SaveTranslation: function () { SaveTranslationToJsonAndCreateTranslationXlf()},
 	ReadJSONTransFile: function(JSONTrans){return ReadJSONTransFile(JSONTrans)},
 	SaveJSONTransfile: function(JSONTrans){SaveJSONTransfile(JSONTrans)},
-	WriteNewXlfFile: function(NewTitle = '',){WriteNewXlfFile(NewTitle)}
-
+	WriteNewXlfFile: function(NewTitle = '',){WriteNewXlfFile(NewTitle)},
+	ProcessXlfFirstFile: async function(filePath='')
+	{
+		var JSONTrans = [];
+		await ProcessXlfFilePreviousTrans(filePath,JSONTrans,WriteJSONTrans);	
+	},
+	ProcessXlfFilePreviousTrans: async function(filePath='')
+	{
+		var JSONTrans = [];
+		JSONTrans = ReadJSONTransFile(JSONTrans);	
+		ProcessXlfFilePreviousTrans(filePath,JSONTrans,WriteJSONPeviousTrans)		
+	}
 }
 async function CreateTranslationJSON() {
 
