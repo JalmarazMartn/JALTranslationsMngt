@@ -51,8 +51,13 @@
 				"command": "JAMALUtilities.SaveTrans",
 				"title": "JAM Translation Step 4: Save traslation and create here the destination xlf file"
 			}
+		],
+		"snippets": [
+			{
+			  "language": "javascript",
+			  "path": "./src/snippets"
+			}
 		]
-
 	},
 	"scripts": {
 		"lint": "eslint .",

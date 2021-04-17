@@ -1,0 +1,19 @@
+{
+    "": {
+        "scope": "json",
+        "prefix": "TJAMCreateTransFile",
+           "body": [
+             "{",
+             "    \"Comment\" : \"General template\",",
+             "    \"OriginalXlfFile\" : \"$OrigEngFile\",",
+             "    \"PreviousTranslationsFiles\":",
+             "    [",
+             "        {\"Path\":\"$PrevTransFile\"}",
+             "    ],",
+             "    \"RemainigTranslationsCSV\"\"$CSVRemTrFile\",",
+             "    \"FinalXlfFile\":\"$FinalFile\"",
+             "}"
+           ],
+        "description": "JAM Create translation steps file"
+    }
+}
