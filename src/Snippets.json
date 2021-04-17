@@ -1,16 +1,17 @@
 {
-    "TJAM Create": {        
+    "TJAM Create": {
+        "scope": "json",        
         "prefix": "TJAMCreateTransFile",
            "body": [
              "{",
              "    \"Comment\" : \"General template\",",
-             "    \"OriginalXlfFile\" : \"$OrigEngFile\",",
+             "    \"OriginalXlfFile\" : ,",
              "    \"PreviousTranslationsFiles\":",
              "    [",
-             "        {\"Path\":\"$PrevTransFile\"}",
+             "        {\"Path\":\"\"}",
              "    ],",
-             "    \"RemainigTranslationsCSV\"\"$CSVRemTrFile\",",
-             "    \"FinalXlfFile\":\"$FinalFile\"",
+             "    \"RemainigTranslationsCSV\"\"\",",
+             "    \"FinalXlfFile\":\"\"",
              "}"
            ],
         "description": "JAM Create translation steps file"

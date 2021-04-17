@@ -54,7 +54,7 @@
 		],
 		"snippets": [
 			{			  
-			  "language": "javascript",				
+			  "language": "json",				
 			  "path": "./src/Snippets.json"
 			}
 		]
