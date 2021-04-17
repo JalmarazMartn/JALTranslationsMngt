@@ -9,7 +9,7 @@
 		"vscode": "^1.46.0"
 	},
 	"categories": [
-		"Other"
+		"Other","Snippets"
 	],
 	"activationEvents": [
 		"onCommand:JAMALUtilities.BeginTrans",
@@ -53,9 +53,9 @@
 			}
 		],
 		"snippets": [
-			{
-			  "language": "javascript",
-			  "path": "./src/snippets"
+			{			  
+			  "language": "javascript",				
+			  "path": "./src/Snippets.json"
 			}
 		]
 	},

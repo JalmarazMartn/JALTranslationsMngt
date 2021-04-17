@@ -1,6 +1,5 @@
 {
-    "": {
-        "scope": "json",
+    "TJAM Create": {        
         "prefix": "TJAMCreateTransFile",
            "body": [
              "{",
