@@ -15,10 +15,14 @@ async function executeTransSteps()
 	{
 		await translation.ProcessXlfFilePreviousTrans(previousTrans[index].Path);
 	}
+
 }
 function getTransStepsJSON() {
 	var currEditor = vscode.window.activeTextEditor;
 	let CurrDoc = currEditor.document;    
     const translateSteps = JSON.parse((CurrDoc.getText()));
 	return (translateSteps);
+}
+async function CreateCSVFile(){
+	
 }

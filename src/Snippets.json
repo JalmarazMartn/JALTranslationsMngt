@@ -5,13 +5,13 @@
            "body": [
              "{",
              "    \"Comment\" : \"General template\",",
-             "    \"OriginalXlfFile\" : ,",
+             "    \"OriginalXlfFile\" : \"${WORKSPACE_FOLDER/[\\\\]/\\//g}/Translations/$WORKSPACE_NAME.g.xlf\",",
              "    \"PreviousTranslationsFiles\":",
              "    [",
              "        {\"Path\":\"\"}",
              "    ],",
-             "    \"RemainigTranslationsCSV\"\"\",",
-             "    \"FinalXlfFile\":\"\"",
+             "    \"RemainigTranslationsCSV\": \"\",",
+             "    \"FinalXlfFile\": \"${WORKSPACE_FOLDER/[\\\\]/\\//g}/Translations/$WORKSPACE_NAME.NL.xlf\",",
              "}"
            ],
         "description": "JAM Create translation steps file"
