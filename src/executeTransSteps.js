@@ -26,3 +26,11 @@ function getTransStepsJSON() {
 async function CreateCSVFile(){
 	
 }
+async function UpdateTranslationFromCSVFile()
+{
+
+}
+async function CreateFinalTranlationFile()
+{
+	
+}
