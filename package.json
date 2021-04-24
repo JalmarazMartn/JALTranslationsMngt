@@ -12,10 +12,11 @@
 		"Other","Snippets"
 	],
 	"activationEvents": [
-		"onCommand:JAMALUtilities.BeginTrans",
-		"onCommand:JAMALUtilities.LoadPreviousTrans",
-		"onCommand:JAMALUtilities.EditTrans",
-		"onCommand:JAMALUtilities.SaveTrans"
+		"onCommand:JAMALTranslation.BeginTrans",
+		"onCommand:JAMALTranslation.LoadPreviousTrans",
+		"onCommand:JAMALTranslation.EditTrans",
+		"onCommand:JAMALTranslation.SaveTrans",
+		"onCommand:JAMALTranslation.ProcessTransStep1"
 	],
 	"main": "./extension.js",
 	"contributes": {
@@ -36,20 +37,24 @@
 		},
 		"commands": [
 			{
-				"command": "JAMALUtilities.BeginTrans",
+				"command": "JAMALTranslation.BeginTrans",
 				"title": "JAM Translation Step 1: Begin translation loading original xlf file"
 			},
 			{
-				"command": "JAMALUtilities.LoadPreviousTrans",
+				"command": "JAMALTranslation.LoadPreviousTrans",
 				"title": "JAM Translation Step 2: Load previous translation Xlf files (n times)"
 			},
 			{
-				"command": "JAMALUtilities.EditTrans",
+				"command": "JAMALTranslation.EditTrans",
 				"title": "JAM Translation Step 3: Edit traslation"
 			},
 			{
-				"command": "JAMALUtilities.SaveTrans",
+				"command": "JAMALTranslation.SaveTrans",
 				"title": "JAM Translation Step 4: Save traslation and create here the destination xlf file"
+			},
+			{
+				"command": "JAMALTranslation.ProcessTransStep1",
+				"title": "JAM Process translation file1: All steps to crete CSv file"
 			}
 		],
 		"snippets": [

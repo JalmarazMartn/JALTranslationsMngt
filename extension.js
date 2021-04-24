@@ -9,28 +9,35 @@ const vscode = require('vscode');
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-	let disposableBeginTrans = vscode.commands.registerCommand('JAMALUtilities.BeginTrans', function () {
+	let disposableBeginTrans = vscode.commands.registerCommand('JAMALTranslation.BeginTrans', function () {
 		const translation = require('./src/translations.js');		
 		translation.InitTranslation();
 	});
 	context.subscriptions.push(disposableBeginTrans);	
-	let LoadPreviousTrans = vscode.commands.registerCommand('JAMALUtilities.LoadPreviousTrans', function () {
+	let LoadPreviousTrans = vscode.commands.registerCommand('JAMALTranslation.LoadPreviousTrans', function () {
 		const translation = require('./src/translations.js');		
 		translation.LoadPreviousTRanslation();
 	});
 	context.subscriptions.push(LoadPreviousTrans);
 
-	let disposableEditTrans = vscode.commands.registerCommand('JAMALUtilities.EditTrans', function () {
+	let disposableEditTrans = vscode.commands.registerCommand('JAMALTranslation.EditTrans', function () {
 		const translation = require('./src/translations.js');		
 		translation.EditTranslation();
 	});
 	context.subscriptions.push(disposableEditTrans);	
 
-	let disposableSaveTrans = vscode.commands.registerCommand('JAMALUtilities.SaveTrans', function () {
+	let disposableSaveTrans = vscode.commands.registerCommand('JAMALTranslation.SaveTrans', function () {
 		const translation = require('./src/translations.js');		
 		translation.SaveTranslation();
 	});
 	context.subscriptions.push(disposableSaveTrans);	
+
+
+	let disposableProcessTransStep1 = vscode.commands.registerCommand('JAMALTranslation.ProcessTransStep1', function () {
+		const executeTransSteps = require('./src/executeTransSteps.js');		
+		executeTransSteps.executeTransSteps();
+	});
+	context.subscriptions.push(disposableProcessTransStep1);
 }
 // @ts-ignore
 exports.activate = activate;
