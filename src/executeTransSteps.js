@@ -1,7 +1,7 @@
 const vscode = require('vscode');
 const sep = ';';
 const carriage = '\r\n';
-
+//"(.*)";"(.*)"
 module.exports = {
 	executeTransSteps: async function (
 	) {
@@ -12,10 +12,12 @@ async function executeTransSteps1()
 {
     const translateSteps = getTransStepsJSON();
 	const translation = require('./translations.js');
+	ChechFileExists(translateSteps.OriginalXlfFile);
 	await translation.ProcessXlfFirstFile(translateSteps.OriginalXlfFile);
 	const previousTrans = translateSteps.PreviousTranslationsFiles;
 	for (let index = 0; index < previousTrans.length; index++)
 	{
+		ChechFileExists(previousTrans[index].Path);
 		await translation.ProcessXlfFilePreviousTrans(previousTrans[index].Path);
 	}
 	CreateCSVFile(translateSteps.RemainigTranslationsCSV);
@@ -28,6 +30,7 @@ function getTransStepsJSON() {
 }
 async function CreateCSVFile(CsvfileName=''){
 	var JSONTrans = [];
+	UpdateTranslationFromCSVFile()
 	const translation = require('./translations.js');	
 	JSONTrans = translation.ReadJSONTransFile(JSONTrans);
 	var LineText = '';	
@@ -37,7 +40,7 @@ async function CreateCSVFile(CsvfileName=''){
 		if (element.source)
 		{
 		if ((element.target == '') ||(element.target == element.source)) {			
-			LineText = LineText + '"' + element.source + '"' + sep + '"' + element.source +'"' +  sep + carriage;		
+			LineText = LineText + '"' + element.source + '"' + sep + '"' + element.source +'"' + carriage;		
 		}
 	}
 	}
@@ -51,4 +54,12 @@ async function UpdateTranslationFromCSVFile()
 async function CreateFinalTranlationFile()
 {
 	
+}
+async function ChechFileExists(FilePath = '')
+{
+	const fs = require('fs');
+	if (!await fs.existsSync(FilePath))
+	{
+		vscode.window.showErrorMessage(FilePath + ' does not exists');
+	}
 }
