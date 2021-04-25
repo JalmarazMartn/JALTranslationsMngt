@@ -11,7 +11,7 @@
              "        {\"Path\":\"\"}",
              "    ],",
              "    \"RemainigTranslationsCSV\": \"\",",
-             "    \"FinalXlfFile\": \"${WORKSPACE_FOLDER/[\\\\]/\\//g}/Translations/$WORKSPACE_NAME.NL.xlf\","
+             "    \"FinalXlfFile\": \"${WORKSPACE_FOLDER/[\\\\]/\\//g}/Translations/$WORKSPACE_NAME.NL.xlf\"",
              "}"
            ],
         "description": "JAM Create translation steps file"

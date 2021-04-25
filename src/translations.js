@@ -2,7 +2,7 @@ const vscode = require('vscode');
 const TargetLabel = 'Target==>';
 const RexRemoveLabels = /\s*(<target.*?>|<source>)(\s*.*)(<\/target>|<\/source>)/gm;
 const RexLanguageLine = /(source-language=".*"\s*target-language=")([a-z\-]*)(")/gmi;
-
+const carriage = '\r\n';
 //
 module.exports = {
 	InitTranslation: function (
@@ -28,6 +28,10 @@ module.exports = {
 		var JSONTrans = [];
 		JSONTrans = ReadJSONTransFile(JSONTrans);	
 		ProcessXlfFilePreviousTrans(filePath,JSONTrans,WriteJSONPeviousTrans)		
+	},
+	GetFullFinalXlfText: function(XlfOriginalDoc)
+	{
+		return GetFullFinalXlfText(XlfOriginalDoc);
 	}
 }
 async function CreateTranslationJSON() {
@@ -239,45 +243,45 @@ async function WriteNewXlfFile(NewTitle = '') {
 	var JSONTrans = [];
 	JSONTrans = ReadJSONTransFile(JSONTrans);
 
+	let XlfDoc = await vscode.workspace.openTextDocument(GetEngFileName(JSONTrans));
+	const TotalFinalText = GetFullFinalXlfText(XlfDoc);
 	const options = {
 		canSelectMany: false,
-		openLabel: 'Open',
+		openLabel: 'Save',
 		title: NewTitle,
 		filters: {
 			'xlf': ['xlf'],
 		}
 	};
-	//let fileUri = await vscode.window.showOpenDialog(options);
-	//vscode.window.showInformationMessage(fileUri[0].fsPath);
-	console.log(JSONTrans);
-	console.log(GetEngFileName(JSONTrans));
-	let XlfDoc = await vscode.workspace.openTextDocument(GetEngFileName(JSONTrans));
-	var currEditor = vscode.window.activeTextEditor;
-	let CurrDoc = currEditor.document;
-	const WSEdit = new vscode.WorkspaceEdit;
-	let lastLine = 0;
-	for (var i = 0; i < XlfDoc.lineCount; i++) {
-		let LineText = XlfDoc.lineAt(i).text;
+	let fileUri = await vscode.window.showSaveDialog(options);	
+	await vscode.workspace.fs.writeFile(fileUri,Buffer.from(TotalFinalText));		
+	vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+}
+function GetFullFinalXlfText(XlfOriginalDoc)
+{
+	var JSONTrans = [];
+	JSONTrans = ReadJSONTransFile(JSONTrans);
+
+	let TotalFinalText = '';
+	for (var i = 0; i < XlfOriginalDoc.lineCount; i++) {
+		let LineText = XlfOriginalDoc.lineAt(i).text;
 		LineText = LineText.replace(RexLanguageLine, GetLanguageText);
-		lastLine = await WriteNewXlfLine(LineText, WSEdit, CurrDoc, lastLine);
+		if (TotalFinalText !== '')
+		{
+			TotalFinalText = TotalFinalText + carriage;
+		}
+			TotalFinalText = TotalFinalText + LineText;
 		if (LineText.match('<source>')) {
 			const SourceText = LineText.replace(RexRemoveLabels, GetTranslationText);
 			var JSONSource = JSONTrans.find(Obj => Obj.source == SourceText);
 			let TargetText = '';
 			if (JSONSource) { TargetText = JSONSource.target; }
 			let TargetLineText = LineText.replace(SourceText, TargetText);
-			TargetLineText = TargetLineText.replace(/source\>/g, 'target>');
-			lastLine = await WriteNewXlfLine(TargetLineText, WSEdit, CurrDoc, lastLine);
+			TargetLineText = TargetLineText.replace(/source\>/g, 'target>');			
+			TotalFinalText = TotalFinalText + carriage + TargetLineText;
 		}
-
-	}
-	await vscode.workspace.applyEdit(WSEdit);
-}
-async function WriteNewXlfLine(LineText = '', WSEdit, CurrDoc, lastLine) {
-	await WSEdit.insert(CurrDoc.uri, new vscode.Position(lastLine, 0), LineText);
-	await vscode.commands.executeCommand('editor.action.insertLineAfter');
-	lastLine = lastLine + 1;
-	return (lastLine);
+	}	
+	return TotalFinalText;
 }
 function GetLanguageText(fullMatch = '', startLabel = '', content = '', endLabel = '') {
 	return (startLabel + GetTargetLanguage() + endLabel);
