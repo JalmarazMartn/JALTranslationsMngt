@@ -1,4 +1,3 @@
-const { visitFunctionBody } = require('typescript');
 const vscode = require('vscode');
 const sep = ';';
 const carriage = '\r\n';
@@ -21,6 +20,7 @@ async function executeTransSteps1()
 		await translation.ProcessXlfFilePreviousTrans(previousTrans[index].Path);
 	}
 	CreateCSVFile(translateSteps.RemainigTranslationsCSV);
+	CreateFinalTranlationFile(translateSteps.OriginalXlfFile,translateSteps.FinalXlfFile);
 }
 function getTransStepsJSON() {
 	var currEditor = vscode.window.activeTextEditor;
@@ -79,7 +79,7 @@ async function UpdateTranslationsFromCSVFile(CsvFilePath = '')
 async function CreateFinalTranlationFile(OriginalXlfPath = '',FinalXlfPath = '')
 {
 	const translations = require('./translations.js');
-	const LineText = translations.GetFullFinalXlfText(vscode.workspace.openTextDocument(OriginalXlfPath));
+	const LineText = translations.GetFullFinalXlfText(await vscode.workspace.openTextDocument(OriginalXlfPath));
 	await vscode.workspace.fs.writeFile(vscode.Uri.file(FinalXlfPath),Buffer.from(LineText));	
 }
 async function ChechFileExists(FilePath = '')
