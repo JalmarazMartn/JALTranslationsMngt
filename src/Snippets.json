@@ -1,19 +1,51 @@
 {
-    "TJAM Create": {
-        "scope": "json",        
-        "prefix": "TJAMCreateTransFile",
-           "body": [
-             "{",
-             "    \"Comment\" : \"General template\",",
-             "    \"OriginalXlfFile\" : \"${WORKSPACE_FOLDER/[\\\\]/\\//g}/Translations/$WORKSPACE_NAME.g.xlf\",",
-             "    \"PreviousTranslationsFiles\":",
-             "    [",
-             "        {\"Path\":\"\"}",
-             "    ],",
-             "    \"RemainigTranslationsCSV\": \"\",",
-             "    \"FinalXlfFile\": \"${WORKSPACE_FOLDER/[\\\\]/\\//g}/Translations/$WORKSPACE_NAME.NL.xlf\"",
-             "}"
-           ],
-        "description": "JAM Create translation steps file"
-    }
+  "TJAM Create": {
+    "scope": "json",
+    "prefix": "TJAMCreateTransFile",
+    "body": [
+      "{",
+      "    \"Comment\": \"General template\",",
+      "    \"OriginalXlfFile\": [",
+      "        {",
+      "            \"SkipStep\": false",
+      "        },",
+      "        {",
+      "            \"Path\": \"${WORKSPACE_FOLDER/[\\\\]/\\//g}/Translations/$WORKSPACE_NAME.g.xlf\"",
+      "        }",
+      "    ],",
+      "    \"PreviousTranslationsFiles\": [",
+      "        {",
+      "            \"SkipStep\": false",
+      "        },",
+      "        {",
+      "            \"Files\": [",
+      "                {",
+      "                    \"Path\": \"\"",
+      "                },",
+      "                {",
+      "                    \"Path\": \"\"",
+      "                }",
+      "            ]",
+      "        }",
+      "    ],",
+      "    \"RemainigTranslationsCSV\": [",
+      "        {",
+      "            \"SkipStep\": false",
+      "        },",
+      "        {",
+      "            \"Path\": \"${WORKSPACE_FOLDER/[\\\\]/\\//g}/ReminTrans.csv\"",
+      "        }",
+      "    ],",
+      "    \"FinalXlfFile\": [",
+      "        {",
+      "            \"SkipStep\": false",
+      "        },",
+      "        {",
+      "            \"Path\": \"${WORKSPACE_FOLDER/[\\\\]/\\//g}/Translations/$WORKSPACE_NAME.ES.xlf\"",
+      "        }",
+      "    ]",
+      "}"
+    ],
+    "description": "JAM Create translation steps file"
+  }
 }

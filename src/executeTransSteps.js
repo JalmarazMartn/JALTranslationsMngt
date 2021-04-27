@@ -1,3 +1,4 @@
+//no mensajes, 
 const vscode = require('vscode');
 const sep = ';';
 const carriage = '\r\n';
@@ -7,86 +8,86 @@ module.exports = {
 		await executeTransSteps1();
 	}
 };
-async function executeTransSteps1()
-{
-    const translateSteps = getTransStepsJSON();
+async function executeTransSteps1() {
+	const translateSteps = getTransStepsJSON();
 	const translation = require('./translations.js');
-	ChechFileExists(translateSteps.OriginalXlfFile);
-	await translation.ProcessXlfFirstFile(translateSteps.OriginalXlfFile);
-	const previousTrans = translateSteps.PreviousTranslationsFiles;
-	for (let index = 0; index < previousTrans.length; index++)
-	{
-		ChechFileExists(previousTrans[index].Path);
-		await translation.ProcessXlfFilePreviousTrans(previousTrans[index].Path);
+	if (!translateSteps.OriginalXlfFile.SkipStep) {
+		CheckFileExists(translateSteps.OriginalXlfFile.Path);
+		await translation.ProcessXlfFirstFile(translateSteps.OriginalXlfFile);
+	};
+	if (!translateSteps.PreviousTranslationsFiles.SkipStep) {
+		const previousTrans = translateSteps.PreviousTranslationsFiles.Files;
+		for (let index = 0; index < previousTrans.length; index++) {
+			CheckFileExists(previousTrans[index].Path);
+			await translation.ProcessXlfFilePreviousTrans(previousTrans[index].Path);
+		}
 	}
-	CreateCSVFile(translateSteps.RemainigTranslationsCSV);
-	CreateFinalTranlationFile(translateSteps.OriginalXlfFile,translateSteps.FinalXlfFile);
+	if (!translateSteps.RemainigTranslationsCSV.SkipStep) {
+		CreateCSVFile(translateSteps.RemainigTranslationsCSV.Path);
+	}
+	if (!translateSteps.FinalXlfFile.SkipStep) {
+		CreateFinalTranlationFile(translateSteps.OriginalXlfFile.Path, translateSteps.FinalXlfFile.Path);
+	}
 }
 function getTransStepsJSON() {
 	var currEditor = vscode.window.activeTextEditor;
-	let CurrDoc = currEditor.document;    
-    const translateSteps = JSON.parse((CurrDoc.getText()));
+	let CurrDoc = currEditor.document;
+	const translateSteps = JSON.parse((CurrDoc.getText()));
 	return (translateSteps);
 }
-async function CreateCSVFile(CsvfileName=''){
+async function CreateCSVFile(CsvfileName = '') {
 	var JSONTrans = [];
 	await UpdateTranslationsFromCSVFile(CsvfileName);
-	const translation = require('./translations.js');	
+	const translation = require('./translations.js');
 	JSONTrans = translation.ReadJSONTransFile(JSONTrans);
-	var LineText = '';	
+	var LineText = '';
 	const CsvFileURI = vscode.Uri.file(CsvfileName);
 	for (var i = 0; i < JSONTrans.length; i++) {
 		var element = JSONTrans[i];
-		if (element.source)
-		{
-		if ((element.target == '') ||(element.target == element.source)) {			
-			LineText = LineText + '"' + element.source + '"' + sep + '"' + element.source +'"' + carriage;		
+		if (element.source) {
+			if ((element.target == '') || (element.target == element.source)) {
+				LineText = LineText + '"' + element.source + '"' + sep + '"' + element.source + '"' + carriage;
+			}
 		}
 	}
-	}
-	await vscode.workspace.fs.writeFile(CsvFileURI,Buffer.from(LineText));
+	await vscode.workspace.fs.writeFile(CsvFileURI, Buffer.from(LineText));
 	vscode.window.showInformationMessage('CSV file created in ' + CsvfileName);
 }
-async function UpdateTranslationsFromCSVFile(CsvFilePath = '')
-{
+async function UpdateTranslationsFromCSVFile(CsvFilePath = '') {
 	const translations = require('./translations.js')
 	let JSONTrans = [];
 	JSONTrans = translations.ReadJSONTransFile(JSONTrans);
-    var fs = require('fs'),
-        readline = require('readline');
+	var fs = require('fs'),
+		readline = require('readline');
 
-    var rd = readline.createInterface({
-        input: fs.createReadStream(CsvFilePath)
-    });
-    rd.on('line', function (line) {
+	var rd = readline.createInterface({
+		input: fs.createReadStream(CsvFilePath)
+	});
+	rd.on('line', function (line) {
 		const TransMatch = line.match(/"(.*)";"(.*)"/);
-		if (!TransMatch)
-		{
+		if (!TransMatch) {
 			return;
 		}
-		const SourceText = TransMatch[1];		
+		const SourceText = TransMatch[1];
 		const TargetText = TransMatch[2];
 		if (TargetText !== SourceText) {
 			var JSONSource = JSONTrans.find(Obj => Obj.source == SourceText);
 			JSONSource.target = TargetText;
-		}	
-    });
-    rd.on('close',function (){
-		translations.SaveJSONTransfile(JSONTrans);		
-    }
-    );		
+		}
+	});
+	rd.on('close', function () {
+		translations.SaveJSONTransfile(JSONTrans);
+	}
+	);
 }
-async function CreateFinalTranlationFile(OriginalXlfPath = '',FinalXlfPath = '')
-{
+async function CreateFinalTranlationFile(OriginalXlfPath = '', FinalXlfPath = '') {
 	const translations = require('./translations.js');
 	const LineText = translations.GetFullFinalXlfText(await vscode.workspace.openTextDocument(OriginalXlfPath));
-	await vscode.workspace.fs.writeFile(vscode.Uri.file(FinalXlfPath),Buffer.from(LineText));	
+	await vscode.workspace.fs.writeFile(vscode.Uri.file(FinalXlfPath), Buffer.from(LineText));
 }
-async function ChechFileExists(FilePath = '')
-{
+async function CheckFileExists(FilePath = '') {
 	const fs = require('fs');
-	if (!await fs.existsSync(FilePath))
-	{
+	if (!await fs.existsSync(FilePath)) {
 		vscode.window.showErrorMessage(FilePath + ' does not exists');
 	}
 }

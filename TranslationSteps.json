@@ -1,11 +1,42 @@
 {
-    "Comment" : "General template",
-    "OriginalXlfFile" : "OriginalFile.xlf",
-    "PreviousTranslationsFiles":
-    [
-        {"Path":""},
-        {"Path":""}
+    "Comment": "General template",
+    "OriginalXlfFile": [
+        {
+            "SkipStep": false
+        },
+        {
+            "Path": "OriginalFile.xlf"
+        }
     ],
-    "RemainigTranslationsCSV":"RemTrFile.csv",
-    "FinalXlfFile":"EspFile.xlf"
+    "PreviousTranslationsFiles": [
+        {
+            "SkipStep": false
+        },
+        {
+            "Files": [
+                {
+                    "Path": ""
+                },
+                {
+                    "Path": ""
+                }
+            ]
+        }
+    ],
+    "RemainigTranslationsCSV": [
+        {
+            "SkipStep": false
+        },
+        {
+            "Path": "RemTrFile.csv"
+        }
+    ],
+    "FinalXlfFile": [
+        {
+            "SkipStep": false
+        },
+        {
+            "Path": "EspFile.xlf"
+        }
+    ]
 }
