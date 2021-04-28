@@ -5,27 +5,28 @@ const carriage = '\r\n';
 module.exports = {
 	executeTransSteps: async function (
 	) {
-		await executeTransSteps1();
+		await executeTransSteps();
 	}
 };
-async function executeTransSteps1() {
+async function executeTransSteps() {
 	const translateSteps = getTransStepsJSON();
 	const translation = require('./translations.js');
-	if (!translateSteps.OriginalXlfFile.SkipStep) {
-		CheckFileExists(translateSteps.OriginalXlfFile.Path);
-		await translation.ProcessXlfFirstFile(translateSteps.OriginalXlfFile);
+	if (!translateSteps.OriginalXlfFile[0].SkipStep) {
+		CheckFileExists(translateSteps.OriginalXlfFile[1].Path);
+		await translation.ProcessXlfFirstFile(translateSteps.OriginalXlfFile[1].Path);
 	};
-	if (!translateSteps.PreviousTranslationsFiles.SkipStep) {
-		const previousTrans = translateSteps.PreviousTranslationsFiles.Files;
+	if (!translateSteps.PreviousTranslationsFiles[0].SkipStep) {
+		const previousTrans = translateSteps.PreviousTranslationsFiles[1].Files;
+		console.log(translateSteps);
 		for (let index = 0; index < previousTrans.length; index++) {
 			CheckFileExists(previousTrans[index].Path);
 			await translation.ProcessXlfFilePreviousTrans(previousTrans[index].Path);
 		}
 	}
-	if (!translateSteps.RemainigTranslationsCSV.SkipStep) {
+	if (!translateSteps.RemainigTranslationsCSV[0].SkipStep) {
 		CreateCSVFile(translateSteps.RemainigTranslationsCSV.Path);
 	}
-	if (!translateSteps.FinalXlfFile.SkipStep) {
+	if (!translateSteps.FinalXlfFile[0].SkipStep) {
 		CreateFinalTranlationFile(translateSteps.OriginalXlfFile.Path, translateSteps.FinalXlfFile.Path);
 	}
 }
