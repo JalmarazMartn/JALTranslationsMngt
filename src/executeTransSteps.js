@@ -2,6 +2,7 @@
 const vscode = require('vscode');
 const sep = ';';
 const carriage = '\r\n';
+const OutputChannel = vscode.window.createOutputChannel(`Output Channel`);
 module.exports = {
 	executeTransSteps: async function (
 	) {
@@ -10,6 +11,7 @@ module.exports = {
 };
 async function executeTransSteps() {
 	const translateSteps = getTransStepsJSON();
+	OutputChannel.clear();
 	const translation = require('./translations.js');
 	if (!translateSteps.OriginalXlfFile[0].SkipStep) {
 		CheckFileExists(translateSteps.OriginalXlfFile[1].Path);
@@ -17,18 +19,18 @@ async function executeTransSteps() {
 	};
 	if (!translateSteps.PreviousTranslationsFiles[0].SkipStep) {
 		const previousTrans = translateSteps.PreviousTranslationsFiles[1].Files;
-		console.log(translateSteps);
 		for (let index = 0; index < previousTrans.length; index++) {
 			CheckFileExists(previousTrans[index].Path);
 			await translation.ProcessXlfFilePreviousTrans(previousTrans[index].Path);
 		}
 	}
 	if (!translateSteps.RemainigTranslationsCSV[0].SkipStep) {
-		CreateCSVFile(translateSteps.RemainigTranslationsCSV.Path);
+		CreateCSVFile(translateSteps.RemainigTranslationsCSV[1].Path);
 	}
 	if (!translateSteps.FinalXlfFile[0].SkipStep) {
-		CreateFinalTranlationFile(translateSteps.OriginalXlfFile.Path, translateSteps.FinalXlfFile.Path);
-	}
+		CreateFinalTranlationFile(translateSteps.OriginalXlfFile[1].Path, translateSteps.FinalXlfFile[1].Path);
+	}	
+	OutputChannel.show();
 }
 function getTransStepsJSON() {
 	var currEditor = vscode.window.activeTextEditor;
@@ -52,7 +54,7 @@ async function CreateCSVFile(CsvfileName = '') {
 		}
 	}
 	await vscode.workspace.fs.writeFile(CsvFileURI, Buffer.from(LineText));
-	vscode.window.showInformationMessage('CSV file created in ' + CsvfileName);
+	OutputChannel.appendLine('CSV file created in ' + CsvfileName);	
 }
 async function UpdateTranslationsFromCSVFile(CsvFilePath = '') {
 	const translations = require('./translations.js')
@@ -89,6 +91,7 @@ async function CreateFinalTranlationFile(OriginalXlfPath = '', FinalXlfPath = ''
 async function CheckFileExists(FilePath = '') {
 	const fs = require('fs');
 	if (!await fs.existsSync(FilePath)) {
+		OutputChannel.appendLine(FilePath + ' does not exists');
 		vscode.window.showErrorMessage(FilePath + ' does not exists');
 	}
 }
