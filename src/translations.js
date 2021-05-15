@@ -75,7 +75,24 @@ async function AskAndProcessXlfFilePreviousTrans(newtitle, JSONTrans) {
 }
 async function ProcessXlfFilePreviousTrans(FilePath='',JSONTrans,FunctionProcLine)
 {
-	vscode.window.showInformationMessage('Processing file:' + FilePath,{modal:false},'Got it');		
+	//vscode.window.showInformationMessage('Processing file:' + FilePath,{modal:false},'Got it');		
+    var fs = require('fs');
+	const content = fs.readFileSync(FilePath,{encoding:'utf8', flag:'r'});
+	const Lines = content.split('\r\n');
+	let CountLines = 0;    
+	var LastSourceText = '';	
+
+	for (let index = 0; index < Lines.length; index++) {
+		CountLines = CountLines + 1;
+		LastSourceText = FunctionProcLine(Lines[index], JSONTrans, LastSourceText);		
+
+	}
+	DeleteJSONTransFile();	
+	SaveJSONTransfile(JSONTrans);		
+}
+async function ProcessXlfFilePreviousTransAsync(FilePath='',JSONTrans,FunctionProcLine)
+{
+	//vscode.window.showInformationMessage('Processing file:' + FilePath,{modal:false},'Got it');		
     var fs = require('fs'),
         readline = require('readline');
 
@@ -91,7 +108,7 @@ async function ProcessXlfFilePreviousTrans(FilePath='',JSONTrans,FunctionProcLin
     rd.on('close',function (){
 		DeleteJSONTransFile();	
 		SaveJSONTransfile(JSONTrans);		
-        vscode.window.showInformationMessage('File ended. File lines: ' + CountLines.toString());
+        //vscode.window.showInformationMessage('File ended. File lines: ' + CountLines.toString());
     }
     );	
 }
@@ -134,18 +151,12 @@ function GetTranslationText(fullMatch = '', startLabel = '', content = '', endLa
 	return (content);
 }
 async function BeginEditTranslation() {
-	//let CurrDoc = await vscode.workspace.openTextDocument(vscode.Uri.parse("untitled:" + "*.xlf"));
 	let CurrDoc = await vscode.workspace.openTextDocument();
 	vscode.window.showTextDocument(CurrDoc, {preview: false});	
-	//if (await ErrorIfNotEmptyDoc())
-	//{return;}
 
-	//var currEditor = vscode.window.activeTextEditor;	
-	//let CurrDoc = currEditor.document;
 	var JSONTrans = [];
 	const WSEdit = new vscode.WorkspaceEdit;
 	JSONTrans = ReadJSONTransFile(JSONTrans);
-	//let lastLine = CurrDoc.lineCount;
 	let lastLine = 0;
 	for (var i = 0; i < JSONTrans.length; i++) {
 		var element = JSONTrans[i];
@@ -192,7 +203,7 @@ function GetFullPathFileJSONS()
 	if (ExtConf) {
 		returnedName = ExtConf.get('JSONTranslationFilename');
 	}
-	return(vscode.Uri.file(vscode.workspace.rootPath + '/.vscode/' + returnedName));
+	return(vscode.Uri.file(vscode.workspace.workspaceFolders[0].uri.path + '/.vscode/' + returnedName));
 }
 function SaveJSONTransfile(JSONTrans) {
 	const fs = require('fs');

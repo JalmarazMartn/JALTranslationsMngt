@@ -1,4 +1,6 @@
-//no mensajes, 
+//Sacar los mensajes.
+//Cargar el csv antes borrarlo.
+//
 const vscode = require('vscode');
 const sep = ';';
 const carriage = '\r\n';
@@ -12,25 +14,29 @@ module.exports = {
 async function executeTransSteps() {
 	const translateSteps = getTransStepsJSON();
 	OutputChannel.clear();
+	OutputChannel.show();
 	const translation = require('./translations.js');
 	if (!translateSteps.OriginalXlfFile[0].SkipStep) {
 		CheckFileExists(translateSteps.OriginalXlfFile[1].Path);
 		await translation.ProcessXlfFirstFile(translateSteps.OriginalXlfFile[1].Path);
+		OutputChannel.appendLine(translateSteps.OriginalXlfFile[1].Path + ' file processed.');		
 	};
 	if (!translateSteps.PreviousTranslationsFiles[0].SkipStep) {
 		const previousTrans = translateSteps.PreviousTranslationsFiles[1].Files;
 		for (let index = 0; index < previousTrans.length; index++) {
 			CheckFileExists(previousTrans[index].Path);
 			await translation.ProcessXlfFilePreviousTrans(previousTrans[index].Path);
+			OutputChannel.appendLine(previousTrans[index].Path + ' file processed.');
 		}
 	}
 	if (!translateSteps.RemainigTranslationsCSV[0].SkipStep) {
 		CreateCSVFile(translateSteps.RemainigTranslationsCSV[1].Path);
+		OutputChannel.appendLine(translateSteps.RemainigTranslationsCSV[1].Path + ' CSV created.');
 	}
 	if (!translateSteps.FinalXlfFile[0].SkipStep) {
 		CreateFinalTranlationFile(translateSteps.OriginalXlfFile[1].Path, translateSteps.FinalXlfFile[1].Path);
+		OutputChannel.appendLine(translateSteps.FinalXlfFile[1].Path + ' end translation file created.');		
 	}	
-	OutputChannel.show();
 }
 function getTransStepsJSON() {
 	var currEditor = vscode.window.activeTextEditor;
@@ -53,8 +59,7 @@ async function CreateCSVFile(CsvfileName = '') {
 			}
 		}
 	}
-	await vscode.workspace.fs.writeFile(CsvFileURI, Buffer.from(LineText));
-	OutputChannel.appendLine('CSV file created in ' + CsvfileName);	
+	await vscode.workspace.fs.writeFile(CsvFileURI, Buffer.from(LineText));	
 }
 async function UpdateTranslationsFromCSVFile(CsvFilePath = '') {
 	const translations = require('./translations.js')
@@ -90,8 +95,7 @@ async function CreateFinalTranlationFile(OriginalXlfPath = '', FinalXlfPath = ''
 }
 async function CheckFileExists(FilePath = '') {
 	const fs = require('fs');
-	if (!await fs.existsSync(FilePath)) {
-		OutputChannel.appendLine(FilePath + ' does not exists');
+	if (!await fs.existsSync(FilePath)) {		
 		vscode.window.showErrorMessage(FilePath + ' does not exists');
 	}
 }
