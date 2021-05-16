@@ -28,7 +28,7 @@
       "            ]",
       "        }",
       "    ],",
-      "    \"RemainigTranslationsCSV\": [",
+      "    \"RemainigTranslationsFile\": [",
       "        {",
       "            \"SkipStep\": false",
       "        },",
