@@ -52,36 +52,33 @@ If we open the file with excel you can see the columns:
 
 ### Step 4
 
-
+When you finish the remaining translations of excel plain text with tabulations file, come the  moment to make final .xlf file:
+    "FinalXlfFile": [
+        {"SkipStep": false},
+        {"Path": "C:/Users/Jesus/Documents/AL/WarehouseAssistant/Translations/WarehouseAssistant.ES.xlf"}
+Here we only set the path of the final Spanish (or your local language) file. But only a language.
+Creating a translation step file
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+For this purpose, you only have to create a new .json file (Ctrl+N and save as any name with json extension in the workspace folder) and type new snippet JAMCreatetransfile:
 
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+![alt text](https://github.com/JalmarazMartn/JALTranslationsMngt/blob/master/images/Snipet.png?raw=true)
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Visual Studio with AL language.
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+* `TargetLanguage`: Set the target language code. Default `es-ES`
+* `JSONTranslationFilename`: Set here if you like another file name for temp json object than `JSONTranslation.json`. Not needed.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+Remember don´t use in the .json file “\” patch separator use “/” instead. I will fix this little issue soon, but right now is what is.
 
 ## Release Notes
 
