@@ -99,3 +99,12 @@ Initial release
 
 Initial release
 
+### 1.0.3
+
+Take first previous final translation and after other previous translations
+
+### 1.0.4
+
+If editor is not in a translation step file open a dialog to pick one, to allow launching process out of trans steps edition.
+
+Icon from https://upload.wikimedia.org/wikipedia/commons/1/14/Google_Translate_logo_%28old%29.png 
