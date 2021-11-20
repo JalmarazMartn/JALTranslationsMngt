@@ -9,42 +9,41 @@ module.exports = {
 	) {
 		CreateTranslationJSON();
 	},
-	LoadPreviousTRanslation()
-	{
+	LoadPreviousTRanslation() {
 		LoadPreviousTranslation();
 	},
 	EditTranslation: function () { BeginEditTranslation() },
-	SaveTranslation: function () { SaveTranslationToJsonAndCreateTranslationXlf()},
-	ReadJSONTransFile: function(JSONTrans){return ReadJSONTransFile(JSONTrans)},
-	SaveJSONTransfile: function(JSONTrans){SaveJSONTransfile(JSONTrans)},
-	WriteNewXlfFile: function(NewTitle = '',){WriteNewXlfFile(NewTitle)},
-	ProcessXlfFirstFile: async function(filePath='')
-	{
+	SaveTranslation: function () { SaveTranslationToJsonAndCreateTranslationXlf() },
+	ReadJSONTransFile: function (JSONTrans) { return ReadJSONTransFile(JSONTrans) },
+	SaveJSONTransfile: function (JSONTrans) { SaveJSONTransfile(JSONTrans) },
+	WriteNewXlfFile: function (NewTitle = '',) { WriteNewXlfFile(NewTitle) },
+	ProcessXlfFirstFile: async function (filePath = '') {
 		var JSONTrans = [];
-		await ProcessXlfFilePreviousTrans(filePath,JSONTrans,WriteJSONTrans);	
+		await ProcessXlfFilePreviousTrans(filePath, JSONTrans, WriteJSONTrans);
 	},
-	ProcessXlfFilePreviousTrans: async function(filePath='')
-	{
+	ProcessXlfFilePreviousTrans: async function (filePath = '') {
 		var JSONTrans = [];
-		JSONTrans = ReadJSONTransFile(JSONTrans);	
-		ProcessXlfFilePreviousTrans(filePath,JSONTrans,WriteJSONPeviousTrans)		
+		JSONTrans = ReadJSONTransFile(JSONTrans);
+		ProcessXlfFilePreviousTrans(filePath, JSONTrans, WriteJSONPeviousTrans)
 	},
-	GetFullFinalXlfText: function(XlfOriginalDoc)
-	{
-		return GetFullFinalXlfText(XlfOriginalDoc);
+	GetFullFinalXlfText: function (XlfOriginalDoc) {
+		return GetFullFinalXlfText(XlfOriginalDoc);	
+	},
+	NewFileFolderExists: function (newFile = '') {
+		return NewFileFolderExists(newFile);
 	}
 }
 async function CreateTranslationJSON() {
 
 	var JSONTrans = [];
 	DeleteJSONTransFile();
-	await AskAndProcessXlfFile('Select xlf file auto generated ENG', JSONTrans);	
+	await AskAndProcessXlfFile('Select xlf file auto generated ENG', JSONTrans);
 };
 async function LoadPreviousTranslation() {
 
 	var JSONTrans = [];
 	JSONTrans = ReadJSONTransFile(JSONTrans);
-	AskAndProcessXlfFilePreviousTrans('Select xlf file previous translation', JSONTrans);	
+	AskAndProcessXlfFilePreviousTrans('Select xlf file previous translation', JSONTrans);
 };
 
 async function AskAndProcessXlfFile(newtitle, JSONTrans) {
@@ -57,9 +56,9 @@ async function AskAndProcessXlfFile(newtitle, JSONTrans) {
 		}
 	};
 	let fileUri = await vscode.window.showOpenDialog(options);
-	SetEngFileName(JSONTrans,fileUri[0].fsPath);	
+	SetEngFileName(JSONTrans, fileUri[0].fsPath);
 	//await ProcessXlfFile(fileUri[0].fsPath,JSONTrans);
-	await ProcessXlfFilePreviousTrans(fileUri[0].fsPath,JSONTrans,WriteJSONTrans);
+	await ProcessXlfFilePreviousTrans(fileUri[0].fsPath, JSONTrans, WriteJSONTrans);
 }
 async function AskAndProcessXlfFilePreviousTrans(newtitle, JSONTrans) {
 	const options = {
@@ -71,62 +70,73 @@ async function AskAndProcessXlfFilePreviousTrans(newtitle, JSONTrans) {
 		}
 	};
 	let fileUri = await vscode.window.showOpenDialog(options);
-	ProcessXlfFilePreviousTrans(fileUri[0].fsPath,JSONTrans,WriteJSONPeviousTrans)
+	ProcessXlfFilePreviousTrans(fileUri[0].fsPath, JSONTrans, WriteJSONPeviousTrans)
 }
-async function ProcessXlfFilePreviousTrans(FilePath='',JSONTrans,FunctionProcLine)
-{
+async function ProcessXlfFilePreviousTrans(FilePath = '', JSONTrans, FunctionProcLine) {
 	//vscode.window.showInformationMessage('Processing file:' + FilePath,{modal:false},'Got it');		
-    var fs = require('fs');
-	const content = fs.readFileSync(FilePath,{encoding:'utf8', flag:'r'});
-	const Lines = content.split('\r\n');
-	let CountLines = 0;    
-	var LastSourceText = '';	
+	try {
+		var fs = require('fs');
+		const content = fs.readFileSync(FilePath, { encoding: 'utf8', flag: 'r' });
+		const Lines = content.split('\r\n');
+		let CountLines = 0;
+		var LastSourceText = '';
 
-	for (let index = 0; index < Lines.length; index++) {
-		CountLines = CountLines + 1;
-		LastSourceText = FunctionProcLine(Lines[index], JSONTrans, LastSourceText);		
+		for (let index = 0; index < Lines.length; index++) {
+			CountLines = CountLines + 1;
+			LastSourceText = FunctionProcLine(Lines[index], JSONTrans, LastSourceText);
 
+		}
+		DeleteJSONTransFile();
+		SaveJSONTransfile(JSONTrans);
 	}
-	DeleteJSONTransFile();	
-	SaveJSONTransfile(JSONTrans);		
+	catch (err) {
+		vscode.window.showErrorMessage('Error in ProcessXlfFilePreviousTrans:' + err.message);
+	}
 }
-async function ProcessXlfFilePreviousTransAsync(FilePath='',JSONTrans,FunctionProcLine)
-{
-	//vscode.window.showInformationMessage('Processing file:' + FilePath,{modal:false},'Got it');		
-    var fs = require('fs'),
-        readline = require('readline');
+async function ProcessXlfFilePreviousTransAsync(FilePath = '', JSONTrans, FunctionProcLine) {
+	try {
+		var fs = require('fs'),
+			readline = require('readline');
 
-    var rd = readline.createInterface({
-        input: fs.createReadStream(FilePath)
-    });
-	let CountLines = 0;    
-	var LastSourceText = '';	
-    rd.on('line', function (line) {
-		CountLines = CountLines + 1;
-		LastSourceText = FunctionProcLine(line, JSONTrans, LastSourceText);		
-    });
-    rd.on('close',function (){
-		DeleteJSONTransFile();	
-		SaveJSONTransfile(JSONTrans);		
-        //vscode.window.showInformationMessage('File ended. File lines: ' + CountLines.toString());
-    }
-    );	
+		var rd = readline.createInterface({
+			input: fs.createReadStream(FilePath)
+		});
+		let CountLines = 0;
+		var LastSourceText = '';
+		rd.on('line', function (line) {
+			CountLines = CountLines + 1;
+			LastSourceText = FunctionProcLine(line, JSONTrans, LastSourceText);
+		});
+		rd.on('close', function () {
+			DeleteJSONTransFile();
+			SaveJSONTransfile(JSONTrans);
+			//vscode.window.showInformationMessage('File ended. File lines: ' + CountLines.toString());
+		}
+		);
+	}
+	catch (err) {
+		vscode.window.showErrorMessage('Error in Process Xlf Previous original File:' + err.message);
+	}
 }
 function WriteJSONPeviousTrans(linetext, JSONTrans, LastSourceText) {
-	if (linetext.match('<source>')) {
-		var ReplacedLineText = linetext.replace(RexRemoveLabels, GetTranslationText);
-		return(ReplacedLineText);
-	}
-	if (linetext.match('<target')) {
-		var JSONSource = JSONTrans.find(Obj => Obj.source == LastSourceText);
-		const NewTargetText = linetext.replace(RexRemoveLabels, GetTranslationText);
-		const SubstituteTranslation = (JSONSource) && (NewTargetText != '') && (NewTargetText != LastSourceText);
-		if (SubstituteTranslation)
-		{
-			JSONSource.target = NewTargetText;
+	try {
+		if (linetext.match('<source>')) {
+			var ReplacedLineText = linetext.replace(RexRemoveLabels, GetTranslationText);
+			return (ReplacedLineText);
 		}
+		if (linetext.match('<target')) {
+			var JSONSource = JSONTrans.find(Obj => Obj.source == LastSourceText);
+			const NewTargetText = linetext.replace(RexRemoveLabels, GetTranslationText);
+			const SubstituteTranslation = (JSONSource) && (NewTargetText != '') && (NewTargetText != LastSourceText);
+			if (SubstituteTranslation) {
+				JSONSource.target = NewTargetText;
+			}
+		}
+		return (LastSourceText);
 	}
-	return (LastSourceText);
+	catch (err) {
+		vscode.window.showErrorMessage('Error in processing previous translation files:' + err.message);
+	}
 }
 function WriteJSONTrans(linetext, JSONTrans, LastSourceText) {
 	if (linetext.match('<source>')) {
@@ -152,7 +162,7 @@ function GetTranslationText(fullMatch = '', startLabel = '', content = '', endLa
 }
 async function BeginEditTranslation() {
 	let CurrDoc = await vscode.workspace.openTextDocument();
-	vscode.window.showTextDocument(CurrDoc, {preview: false});	
+	vscode.window.showTextDocument(CurrDoc, { preview: false });
 
 	var JSONTrans = [];
 	const WSEdit = new vscode.WorkspaceEdit;
@@ -160,12 +170,11 @@ async function BeginEditTranslation() {
 	let lastLine = 0;
 	for (var i = 0; i < JSONTrans.length; i++) {
 		var element = JSONTrans[i];
-		if (element.source)
-		{
-		if ((element.target == '') ||(element.target == element.source)) {
-			lastLine = await WriteElementToEdit(element, WSEdit, CurrDoc, lastLine);
+		if (element.source) {
+			if ((element.target == '') || (element.target == element.source)) {
+				lastLine = await WriteElementToEdit(element, WSEdit, CurrDoc, lastLine);
+			}
 		}
-	}
 	}
 	await vscode.workspace.applyEdit(WSEdit);
 }
@@ -189,21 +198,20 @@ function ReadJSONTransFile(JSONTrans) {
 	return (JSONTrans);
 }
 function DeleteJSONTransFile() {
-	
+
 	const fs = require('fs');
 	const JSONFileURI = GetFullPathFileJSONS();
 	if (fs.existsSync(JSONFileURI.fsPath)) {
 		fs.unlinkSync(JSONFileURI.fsPath);
 	}
 }
-function GetFullPathFileJSONS()
-{
+function GetFullPathFileJSONS() {
 	var returnedName = 'JSONTranslation.json';
 	const ExtConf = vscode.workspace.getConfiguration('');
 	if (ExtConf) {
 		returnedName = ExtConf.get('JSONTranslationFilename');
 	}
-	return(vscode.Uri.file(vscode.workspace.workspaceFolders[0].uri.path + '/.vscode/' + returnedName));
+	return (vscode.Uri.file(vscode.workspace.workspaceFolders[0].uri.path + '/.vscode/' + returnedName));
 }
 function SaveJSONTransfile(JSONTrans) {
 	const fs = require('fs');
@@ -211,8 +219,7 @@ function SaveJSONTransfile(JSONTrans) {
 	const JSONFileURI = GetFullPathFileJSONS();
 	fs.writeFileSync(JSONFileURI.fsPath, JSON.stringify(JSONTrans));
 }
-async function SaveTranslationToJsonAndCreateTranslationXlf()
-{
+async function SaveTranslationToJsonAndCreateTranslationXlf() {
 	await SaveTranslationToJson();
 	await ClearCurrentDocument();
 	await WriteNewXlfFile('Select xlf file');
@@ -240,17 +247,15 @@ function SaveTranslationToJson() {
 async function ClearCurrentDocument() {
 	var currEditor = vscode.window.activeTextEditor;
 	let CurrDoc = currEditor.document;
-	const WSEdit = new vscode.WorkspaceEdit;	
-	const range = new vscode.Range(new vscode.Position(0,0),new vscode.Position(CurrDoc.lineCount,0));
-	await WSEdit.delete(CurrDoc.uri, range);		
-	await vscode.workspace.applyEdit(WSEdit);	
+	const WSEdit = new vscode.WorkspaceEdit;
+	const range = new vscode.Range(new vscode.Position(0, 0), new vscode.Position(CurrDoc.lineCount, 0));
+	await WSEdit.delete(CurrDoc.uri, range);
+	await vscode.workspace.applyEdit(WSEdit);
 	//await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
 }
 
 async function WriteNewXlfFile(NewTitle = '') {
-	if (await ErrorIfNotEmptyDoc())
-	{return;}
-
+	if (await ErrorIfNotEmptyDoc()) { return; }
 	var JSONTrans = [];
 	JSONTrans = ReadJSONTransFile(JSONTrans);
 
@@ -264,12 +269,11 @@ async function WriteNewXlfFile(NewTitle = '') {
 			'xlf': ['xlf'],
 		}
 	};
-	let fileUri = await vscode.window.showSaveDialog(options);	
-	await vscode.workspace.fs.writeFile(fileUri,Buffer.from(TotalFinalText));		
+	let fileUri = await vscode.window.showSaveDialog(options);
+	await vscode.workspace.fs.writeFile(fileUri, Buffer.from(TotalFinalText));
 	vscode.commands.executeCommand('workbench.action.closeActiveEditor');
 }
-function GetFullFinalXlfText(XlfOriginalDoc)
-{
+function GetFullFinalXlfText(XlfOriginalDoc) {
 	var JSONTrans = [];
 	JSONTrans = ReadJSONTransFile(JSONTrans);
 
@@ -277,21 +281,20 @@ function GetFullFinalXlfText(XlfOriginalDoc)
 	for (var i = 0; i < XlfOriginalDoc.lineCount; i++) {
 		let LineText = XlfOriginalDoc.lineAt(i).text;
 		LineText = LineText.replace(RexLanguageLine, GetLanguageText);
-		if (TotalFinalText !== '')
-		{
+		if (TotalFinalText !== '') {
 			TotalFinalText = TotalFinalText + carriage;
 		}
-			TotalFinalText = TotalFinalText + LineText;
+		TotalFinalText = TotalFinalText + LineText;
 		if (LineText.match('<source>')) {
 			const SourceText = LineText.replace(RexRemoveLabels, GetTranslationText);
 			var JSONSource = JSONTrans.find(Obj => Obj.source == SourceText);
 			let TargetText = '';
 			if (JSONSource) { TargetText = JSONSource.target; }
 			let TargetLineText = LineText.replace(SourceText, TargetText);
-			TargetLineText = TargetLineText.replace(/source\>/g, 'target>');			
+			TargetLineText = TargetLineText.replace(/source\>/g, 'target>');
 			TotalFinalText = TotalFinalText + carriage + TargetLineText;
 		}
-	}	
+	}
 	return TotalFinalText;
 }
 function GetLanguageText(fullMatch = '', startLabel = '', content = '', endLabel = '') {
@@ -301,42 +304,50 @@ function GetTargetLanguage() {
 	const ExtConf = vscode.workspace.getConfiguration('');
 	if (ExtConf) {
 		return (ExtConf.get('TargetLanguage'));
-	}	
+	}
 }
-async function ErrorIfNotEmptyDoc()
-{
+async function ErrorIfNotEmptyDoc() {
 	var currEditor = vscode.window.activeTextEditor;
-	if (!currEditor)
-	{await vscode.window.showErrorMessage('There is no current editor.')
-	return true;
-}
+	if (!currEditor) {
+		await vscode.window.showErrorMessage('There is no current editor.')
+		return true;
+	}
 	let CurrDoc = currEditor.document;
-	if (!CurrDoc)
-	{await vscode.window.showErrorMessage('There is no current document.')
-	return true;
-}
+	if (!CurrDoc) {
+		await vscode.window.showErrorMessage('There is no current document.')
+		return true;
+	}
 
 	let CharCount = 0;
 	for (var i = 0; i < CurrDoc.lineCount; i++) {
 		CharCount = CharCount + CurrDoc.lineAt(i).text.length;
-	}		
-	if (CharCount > 0)
-	{await vscode.window.showErrorMessage('The current document must be empty.')
-	return true;
-}
+	}
+	if (CharCount > 0) {
+		await vscode.window.showErrorMessage('The current document must be empty.')
+		return true;
+	}
 
 	return false;
 }
-function SetEngFileName(JSONTrans,EngFileName='')
-{
+function SetEngFileName(JSONTrans, EngFileName = '') {
 	JSONTrans.push(
 		{
 			"EngFileName": EngFileName
 		});
 
 }
-function GetEngFileName(JSONTrans)
-{
-var element = JSONTrans.find(Obj => Obj.EngFileName != '');
-return(element.EngFileName);
+function GetEngFileName(JSONTrans) {
+	var element = JSONTrans.find(Obj => Obj.EngFileName != '');
+	return (element.EngFileName);
+}
+//verify if the folder of the xlf file exists
+function NewFileFolderExists(fileName = '') {
+	const fs = require('fs');
+	const path = require('path');
+	const folder = path.dirname(fileName);
+	if (!fs.existsSync(folder)) {
+		vscode.window.showErrorMessage('The folder not exists:' + folder);
+		return false;
+	}
+	return true;
 }

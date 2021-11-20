@@ -60,8 +60,12 @@ async function getTransStepsJSON() {
 }
 async function CreateRemainingTransFile(RemTransFileName = '') {
 	var JSONTrans = [];
-	await UpdateTranslationsFromRemTransFile(RemTransFileName);
 	const translation = require('./translations.js');
+	if (!translation.NewFileFolderExists(RemTransFileName)) {
+		return;
+	}
+
+	await UpdateTranslationsFromRemTransFile(RemTransFileName);
 	JSONTrans = translation.ReadJSONTransFile(JSONTrans);
 	var LineText = '';
 	const RemTransFileURI = vscode.Uri.file(RemTransFileName);
@@ -102,6 +106,9 @@ async function UpdateTranslationsFromRemTransFile(RemTransFilePath = '') {
 }
 async function CreateFinalTranlationFile(OriginalXlfPath = '', FinalXlfPath = '') {
 	const translations = require('./translations.js');
+	if (!translations.NewFileFolderExists(FinalXlfPath)) {
+		return;
+	}
 	const LineText = translations.GetFullFinalXlfText(await vscode.workspace.openTextDocument(OriginalXlfPath));
 	await vscode.workspace.fs.writeFile(vscode.Uri.file(FinalXlfPath), Buffer.from(LineText));
 }
