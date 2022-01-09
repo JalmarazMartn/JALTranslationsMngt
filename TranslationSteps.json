@@ -38,5 +38,7 @@
         {
             "Path": "EspFile.xlf"
         }
+    ],
+    "ExclusionsFromManual": [
     ]
 }

@@ -19,6 +19,7 @@ async function executeTransSteps() {
 	if (!translateSteps.OriginalXlfFile[0].SkipStep) {
 		CheckFileExists(translateSteps.OriginalXlfFile[1].Path);
 		OutputChannel.appendLine('Building translation object...');
+		translation.SetExclusions(translateSteps);
 		await translation.ProcessXlfFirstFile(translateSteps.OriginalXlfFile[1].Path);
 		await SavePreviousFinalTrans(translateSteps.FinalXlfFile[1].Path);
 		OutputChannel.appendLine(translateSteps.OriginalXlfFile[1].Path + ' file processed.');
@@ -72,8 +73,9 @@ async function CreateRemainingTransFile(RemTransFileName = '') {
 	for (var i = 0; i < JSONTrans.length; i++) {
 		var element = JSONTrans[i];
 		if (element.source) {
-			if ((element.target == '') || (element.target == element.source)) {
-				//LineText = LineText + '"' + element.source + '"' + sep + '"' + element.source + '"' + carriage;
+			let WriteCSVLine = ((element.target == '') || (element.target == element.source)) 
+				&& (element.ExcludeTransFromCSV  !== 'Y');
+			if (WriteCSVLine) {
 				LineText = LineText + element.source + HorTab + element.source + carriage;
 			}
 		}

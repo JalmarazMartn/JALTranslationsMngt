@@ -3,6 +3,8 @@ const TargetLabel = 'Target==>';
 const RexRemoveLabels = /\s*(<target.*?>|<source>)(\s*.*)(<\/target>|<\/source>)/gm;
 const RexLanguageLine = /(source-language=".*"\s*target-language=")([a-z\-]*)(")/gmi;
 const carriage = '\r\n';
+let Exclusions = [];
+var unitTrans = [];
 //
 module.exports = {
 	InitTranslation: function (
@@ -27,10 +29,13 @@ module.exports = {
 		ProcessXlfFilePreviousTrans(filePath, JSONTrans, WriteJSONPeviousTrans)
 	},
 	GetFullFinalXlfText: function (XlfOriginalDoc) {
-		return GetFullFinalXlfText(XlfOriginalDoc);	
+		return GetFullFinalXlfText(XlfOriginalDoc);
 	},
 	NewFileFolderExists: function (newFile = '') {
 		return NewFileFolderExists(newFile);
+	},
+	SetExclusions: function (translateSteps) {
+		SetExclusions(translateSteps);
 	}
 }
 async function CreateTranslationJSON() {
@@ -103,6 +108,7 @@ async function ProcessXlfFilePreviousTransAsync(FilePath = '', JSONTrans, Functi
 		});
 		let CountLines = 0;
 		var LastSourceText = '';
+
 		rd.on('line', function (line) {
 			CountLines = CountLines + 1;
 			LastSourceText = FunctionProcLine(line, JSONTrans, LastSourceText);
@@ -139,21 +145,25 @@ function WriteJSONPeviousTrans(linetext, JSONTrans, LastSourceText) {
 	}
 }
 function WriteJSONTrans(linetext, JSONTrans, LastSourceText) {
+	unitTrans.push(linetext);
 	if (linetext.match('<source>')) {
 		var ReplacedLineText = linetext.replace(RexRemoveLabels, GetTranslationText);
 		if (!JSONTrans.find(JSONTrans => JSONTrans.source == ReplacedLineText)) {
 			JSONTrans.push(
 				{
 					"source": ReplacedLineText,
-					"target": ''
+					"target": '',
+					"ExcludeTransFromCSV": ''
 				});
 		}
 		return (linetext.replace(RexRemoveLabels, GetTranslationText));
 	}
+
 	if (linetext.match('<target>')) {
 		var JSONSource = JSONTrans.find(Obj => Obj.source == LastSourceText);
 		JSONSource.target = linetext.replace(RexRemoveLabels, GetTranslationText);
-	}
+	}	
+	processUnitTransExclusion(JSONTrans, linetext, LastSourceText);
 	return (LastSourceText);
 }
 // @ts-ignore
@@ -350,4 +360,44 @@ function NewFileFolderExists(fileName = '') {
 		return false;
 	}
 	return true;
+}
+function processUnitTransExclusion(JSONTrans, line = '', LastSourceText = '') {		
+	if (line.search(/<\/trans-unit>/i) <= -1) {
+		return;
+	};	
+	let ExcludeUnitTrans = 'N';
+	for (let index = 0; index < unitTrans.length; index++) {
+		const element = unitTrans[index];		
+		if (MatchAnyExclusion(element)) {
+			ExcludeUnitTrans = 'Y';			
+		}		
+	}
+	UpdateExcludeCsv(unitTrans, ExcludeUnitTrans, JSONTrans, LastSourceText);
+	unitTrans = [];
+}
+//funtion that take string and try to match it with an regexp array
+function MatchAnyExclusion(fileLine) {	
+	if (!Exclusions) { return false; }
+
+	for (let index = 0; index < Exclusions.length; index++) {		
+		const element = Exclusions[index];
+		if (fileLine.search(RegExp(element, 'gi')) > -1) {
+			return true;
+		}
+	}
+	return false;
+}
+function SetExclusions(translateSteps) {
+	Exclusions = []	
+		if (translateSteps.ExclusionsFromManual) {
+			Exclusions = translateSteps.ExclusionsFromManual;
+		}			
+}
+function UpdateExcludeCsv(unitTrans, ExcludeUnitTrans, JSONTrans, LastSourceText) {
+	var JSONSource = JSONTrans.find(Obj => Obj.source == LastSourceText);	
+	if (JSONSource) {
+		if (JSONSource.ExcludeTransFromCSV !== 'N') {
+			JSONSource.ExcludeTransFromCSV = ExcludeUnitTrans;
+		}
+	}
 }

@@ -43,7 +43,9 @@
       "        {",
       "            \"Path\": \"${WORKSPACE_FOLDER/[\\\\]/\\//g}/Translations/$WORKSPACE_NAME.ES.xlf\"",
       "        }",
-      "    ]",
+      "    ],",
+      "    \"ExclusionsFromManual\": [",
+      "     ]",
       "}"
     ],
     "description": "JAM Create translation steps file"
