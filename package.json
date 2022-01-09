@@ -3,7 +3,7 @@
 	"displayName": "JAL Translations Mngt",
 	"description": "Manage xlf translation files for AL BC Central",
 	"publisher": "JessAlmarazMartin",	
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"icon": "images/Google_Translate_logo_(old).png",
 	"repository": "https://github.com/JalmarazMartn/JALTranslationsMngt/",
 	"engines": {

@@ -72,6 +72,17 @@ When you complete the set up you can type the run with F1 “JAM Process transla
 
 This command will perform all the four steps to get the final translation file. You can execute twice or n times if you need, as you manually translate the remaining captions.
 
+### Exclusions
+
+You can exclude some translations from the process, for example, if you don´t want to translate local country expressions, you can do it in the final of .json file, with the following step specification:
+        "ExclusionsFromManual": []
+
+#### Notes for exclusions:
+
+- You only exclude these elements from the manual process, not from the final .xlf file. If there is a previous translation in any processed .xlf file, it will be included in the final .xlf file. The final target of this feature is to avoid translating not interesting local country elements.
+- You can express exclusions with regular expressions, for example: report.* or with direct string expressions: “report”.
+- Exclusions will be checked in all translate unit. That means, that the exclusion could be in the source, or in a xlf note inside the translation unit.
+
 ## Features
 
 For this purpose, you only have to create a new .json file (Ctrl+N and save as any name with json extension in the workspace folder) and type new snippet JAMCreatetransfile:
@@ -112,3 +123,7 @@ Icon from https://upload.wikimedia.org/wikipedia/commons/1/14/Google_Translate_l
 ### 1.0.5
 
 Check and raise error if files or folders not exists
+
+### 1.0.6
+
+Exclusions from manual process feature
