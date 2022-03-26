@@ -82,7 +82,7 @@ async function ProcessXlfFilePreviousTrans(FilePath = '', JSONTrans, FunctionPro
 	try {
 		var fs = require('fs');
 		const content = fs.readFileSync(FilePath, { encoding: 'utf8', flag: 'r' });
-		const Lines = content.split('\r\n');
+		const Lines = content.split(getSplitLineChar(content));
 		let CountLines = 0;
 		var LastSourceText = '';
 
@@ -400,4 +400,13 @@ function UpdateExcludeCsv(unitTrans, ExcludeUnitTrans, JSONTrans, LastSourceText
 			JSONSource.ExcludeTransFromCSV = ExcludeUnitTrans;
 		}
 	}
+}
+function getSplitLineChar(content = '') {
+	if (content.search('\r\n') > -1) {
+		return '\r\n';
+	}
+	if (content.search('\n') > -1) {
+		return '\n';
+	}
+	return '';
 }

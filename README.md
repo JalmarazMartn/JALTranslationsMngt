@@ -127,3 +127,7 @@ Check and raise error if files or folders not exists
 ### 1.0.6
 
 Exclusions from manual process feature
+
+### 1.0.7
+
+Error when carrige return is only /n instead of /r/n.
