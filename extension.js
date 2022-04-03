@@ -38,6 +38,13 @@ function activate(context) {
 		executeTransSteps.executeTransSteps();
 	});
 	context.subscriptions.push(disposableProcessTransStep1);
+
+	let disposableShowHtmlView = vscode.commands.registerCommand('JAMALTranslation.ShowHtmlView', function () {
+		const HtmlView = require('./src/HTMLView.js');
+		HtmlView.EditHtmlTranslation(context);
+	});
+	context.subscriptions.push(disposableShowHtmlView);
+
 }
 // @ts-ignore
 exports.activate = activate;

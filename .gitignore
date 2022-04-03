@@ -2,3 +2,7 @@ node_modules
 .vscode-test/
 *.vsix
 TranslatEdit.html
+src/TextArea.html
+TextArea.html
+TranslationSaveButton.html
+src/HTMLViewOLD.js

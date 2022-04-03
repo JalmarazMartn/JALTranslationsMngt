@@ -13,7 +13,8 @@
 		"Other","Snippets"
 	],
 	"activationEvents": [
-		"onCommand:JAMALTranslation.ProcessTransStep1"
+		"onCommand:JAMALTranslation.ProcessTransStep1",
+		"onCommand:JAMALTranslation.ShowHtmlView"
 	],
 	"main": "./extension.js",
 	"contributes": {
@@ -28,7 +29,11 @@
 				"TargetLanguage": {
 					"type": "string",
 					"default": "es-ES",
-					"description": "Temporal translation file"
+					"description": "Target language"
+				},
+				"CSSHTMLTableView": {
+					"type": "string",
+					"description": "Set a CSS style file for the edit translations view"
 				}
 			}
 		},
@@ -36,6 +41,10 @@
 			{
 				"command": "JAMALTranslation.ProcessTransStep1",
 				"title": "JAM Process translation all steps"
+			},
+			{
+				"command": "JAMALTranslation.ShowHtmlView",
+				"title": "Show HTML view with remaining translations"
 			}
 		],
 		"snippets": [
