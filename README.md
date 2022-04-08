@@ -12,7 +12,7 @@ But we have our own approach to the subject. So, for ease the translation, we se
 3.	After this step above, I have a lot of translation done working almost nothing. The next thing I want to have are the remaining translations, captions that don´t have translations yet, without duplicates in an Excel file to end the work. This must be the only manual work in the process 
 4.	The final step must be building the final xlf in the target language: the file must be done merging the original file, previous translation files and our manual final translations in the Excel plain file text files with tabulations.
 
-## Working eith the extension
+## Working with the extension
 
 Start creating a new .json empty file Control + N and Control + S. Name it whatever you want, but important, the file extension must be .json, this way we have object validation. Inside the new .json file you can type the snippet “TJAMCreateTransFile” and brings you the four steps structure:
 ![alt text](https://github.com/JalmarazMartn/JALTranslationsMngt/blob/master/images/Snipet.png?raw=true)
@@ -83,9 +83,16 @@ You can exclude some translations from the process, for example, if you don´t w
 - You can express exclusions with regular expressions, for example: report.* or with direct string expressions: “report”.
 - Exclusions will be checked in all translate unit. That means, that the exclusion could be in the source, or in a xlf note inside the translation unit.
 
+### Edit remaining translations with HTML view
+
+With command F2 “JAM Edit remaining translations with HTML view” you can edit the remaining translations in a HTML view. You can see the remaining captions in the source language, and you can edit the captions in the target language. With save button you can save the changes in the target language. App will display a file dialog to select your json translation steps file.
+You can set your styyle for HTML with configutation parameter "CSSHTMLTableView". Other way you have a default table style.
+
 ## Features
 
-For this purpose, you only have to create a new .json file (Ctrl+N and save as any name with json extension in the workspace folder) and type new snippet JAMCreatetransfile:
+For this purpose, you only have to create a new .json file (Ctrl+N and save as any name with json extension in the workspace folder) and type new snippet JAMCreatetransfile.
+
+
 
 ## Requirements
 
@@ -97,6 +104,7 @@ This extension contributes the following settings:
 
 * `TargetLanguage`: Set the target language code. Default `es-ES`
 * `JSONTranslationFilename`: Set here if you like another file name for temp json object than `JSONTranslation.json`. Not needed.
+* `CSSHTMLTableview`: Set your CSS tableview for remaining translations editting.
 
 ## Known Issues
 
@@ -131,3 +139,7 @@ Exclusions from manual process feature
 ### 1.0.7
 
 Error when carrige return is only /n instead of /r/n.
+
+### 1.0.8
+
+HTML view for remaining translations editting. Set your own CSS for this purpose.

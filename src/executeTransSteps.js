@@ -9,6 +9,15 @@ module.exports = {
 	executeTransSteps: async function (
 	) {
 		await executeTransSteps();
+	},
+	getTransStepsJSON: async function (
+	) {
+		return await getTransStepsJSON();
+	},
+	CreateFinalTranlationFile: async function (
+		translateSteps
+	) {
+		await CreateFinalTranlationFile(translateSteps);
 	}
 };
 async function executeTransSteps() {
@@ -40,7 +49,7 @@ async function executeTransSteps() {
 	}
 	if (!translateSteps.FinalXlfFile[0].SkipStep) {
 		OutputChannel.appendLine('Writting final trans file');
-		CreateFinalTranlationFile(translateSteps.OriginalXlfFile[1].Path, translateSteps.FinalXlfFile[1].Path);
+		CreateFinalTranlationFile(translateSteps);
 		OutputChannel.appendLine(translateSteps.FinalXlfFile[1].Path + ' end translation file created.');
 	}
 }
@@ -106,13 +115,13 @@ async function UpdateTranslationsFromRemTransFile(RemTransFilePath = '') {
 	}
 	translations.SaveJSONTransfile(JSONTrans);
 }
-async function CreateFinalTranlationFile(OriginalXlfPath = '', FinalXlfPath = '') {
+async function CreateFinalTranlationFile(translateSteps) {
 	const translations = require('./translations.js');
-	if (!translations.NewFileFolderExists(FinalXlfPath)) {
+	if (!translations.NewFileFolderExists(translateSteps.FinalXlfFile[1].Path)) {
 		return;
 	}
-	const LineText = translations.GetFullFinalXlfText(await vscode.workspace.openTextDocument(OriginalXlfPath));
-	await vscode.workspace.fs.writeFile(vscode.Uri.file(FinalXlfPath), Buffer.from(LineText));
+	const LineText = translations.GetFullFinalXlfText(await vscode.workspace.openTextDocument(translateSteps.OriginalXlfFile[1].Path));
+	await vscode.workspace.fs.writeFile(vscode.Uri.file(translateSteps.FinalXlfFile[1].Path), Buffer.from(LineText));
 }
 async function CheckFileExists(FilePath = '') {
 	const fs = require('fs');

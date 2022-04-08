@@ -43,7 +43,7 @@ function GetHtmlTableContent() {
   }
   return HtmlTableContent;
 }
-function SaveHtmlTranslation(HtmlTranslation = '') {
+async function SaveHtmlTranslation(HtmlTranslation = '') {
   const TableRowsRegExp = new RegExp(TableRowsPattern, 'gm');
   const RowsMatches = HtmlTranslation.match(TableRowsRegExp);
   if (!RowsMatches) {
@@ -51,13 +51,17 @@ function SaveHtmlTranslation(HtmlTranslation = '') {
   }
   var JSONTrans = [];
   var translations = require('./translations.js');
-  JSONTrans = translations.ReadJSONTransFile(JSONTrans);
+  const executeTransSteps = require('./executeTransSteps.js');
+  JSONTrans = await translations.ReadJSONTransFile(JSONTrans);
   for (var i = 0; i < Object.keys(RowsMatches).length; i++) {
     UpdateTranslationWithHtmlRow(RowsMatches[i], JSONTrans);
   }
-
-  translations.SaveJSONTransfile(JSONTrans);
-  //translations.WriteNewXlfFile('Select xlf file');
+  await translations.SaveJSONTransfile(JSONTrans);  
+  const TransStepsJSON = await executeTransSteps.getTransStepsJSON();
+  if (!TransStepsJSON) {
+    return;
+  }
+  executeTransSteps.CreateFinalTranlationFile(TransStepsJSON);
 }
 function UpdateTranslationWithHtmlRow(HtmlRow = '', JSONTrans = []) {
   const TableRowsRegExp = new RegExp(TableRowsPattern, '');

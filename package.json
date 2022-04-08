@@ -44,7 +44,7 @@
 			},
 			{
 				"command": "JAMALTranslation.ShowHtmlView",
-				"title": "Show HTML view with remaining translations"
+				"title": "JAM Edit remaining translations with HTML view"
 			}
 		],
 		"snippets": [
