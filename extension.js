@@ -45,6 +45,11 @@ function activate(context) {
 	});
 	context.subscriptions.push(disposableShowHtmlView);
 
+	let createAllTranslationsCSV = vscode.commands.registerCommand('JAMALTranslation.createAllTranslationsCSV', function () {
+		const getAllTranslationsFile = require('./src/getAllTranslationsFile.js');
+		getAllTranslationsFile.getAllTranslationsCSVFile();
+	});
+	context.subscriptions.push(createAllTranslationsCSV);
 }
 // @ts-ignore
 exports.activate = activate;

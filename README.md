@@ -72,6 +72,15 @@ When you complete the set up you can type the run with F1 “JAM Process transla
 
 This command will perform all the four steps to get the final translation file. You can execute twice or n times if you need, as you manually translate the remaining captions.
 
+### Create a CSV file with all workspace translations
+
+With command "JAM Create a CSV file with all workspace translations", we create a file with all translation, for reviewing purposes. You must follow these steps:
+- Execute command "JAM Create a CSV file with all workspace translations".
+- Select the type of result file you want: source, target or both. source=captions in source language. target=captions translated. both=Umh....both, source and target.
+- Select file destination.
+
+Warning: translation  steps must be executed before this exportation.
+
 ### Exclusions
 
 You can exclude some translations from the process, for example, if you don´t want to translate local country expressions, you can do it in the final of .json file, with the following step specification:
@@ -143,3 +152,7 @@ Error when carrige return is only /n instead of /r/n.
 ### 1.0.8
 
 HTML view for remaining translations editting. Set your own CSS for this purpose.
+
+### 1.0.9
+
+New command "JAM Create a CSV file with all workspace translations".

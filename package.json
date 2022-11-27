@@ -3,7 +3,7 @@
 	"displayName": "JAL Translations Mngt",
 	"description": "Manage xlf translation files for AL BC Central",
 	"publisher": "JessAlmarazMartin",	
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"icon": "images/Google_Translate_logo_(old).png",
 	"repository": "https://github.com/JalmarazMartn/JALTranslationsMngt/",
 	"engines": {
@@ -14,7 +14,8 @@
 	],
 	"activationEvents": [
 		"onCommand:JAMALTranslation.ProcessTransStep1",
-		"onCommand:JAMALTranslation.ShowHtmlView"
+		"onCommand:JAMALTranslation.ShowHtmlView",
+		"onCommand:JAMALTranslation.createAllTranslationsCSV"
 	],
 	"main": "./extension.js",
 	"contributes": {
@@ -45,6 +46,10 @@
 			{
 				"command": "JAMALTranslation.ShowHtmlView",
 				"title": "JAM Edit remaining translations with HTML view"
+			},
+			{
+				"command": "JAMALTranslation.createAllTranslationsCSV",
+				"title": "JAM Create a CSV file with all workspace translations"
 			}
 		],
 		"snippets": [
