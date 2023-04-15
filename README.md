@@ -43,6 +43,8 @@ The step 2 feed the target translation from previous translation files:
 
 The first file is the translations that we got after the txt2al process. The second one is the standard Spanish translation of all the app. This way with the first one I get all I have translated in 140 version, and with the second we avoid repeating common NAV translations, you know what I mean, “Posting date”, “Document No.”, “Item No.” “Location Code” and so on.
 
+**It is very important the sequence order you place previous translations files here. Next previous processed file will overwrite previous translations. The last previous file will overwrite all previous translations.**
+
 ### Step 3
 
 In this step, we create a excel plain text file, with the remaining expressions we have not translated in the previous steps.
