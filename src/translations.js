@@ -5,6 +5,7 @@ const RexLanguageLine = /(source-language=".*"\s*target-language=")([a-z\-]*)(")
 const carriage = '\r\n';
 let Exclusions = [];
 var unitTrans = [];
+var JSONMultipleTrans = [];
 //
 module.exports = {
 	InitTranslation: function (
@@ -79,6 +80,7 @@ async function AskAndProcessXlfFilePreviousTrans(newtitle, JSONTrans) {
 }
 async function ProcessXlfFilePreviousTrans(FilePath = '', JSONTrans, FunctionProcLine) {
 	//vscode.window.showInformationMessage('Processing file:' + FilePath,{modal:false},'Got it');		
+	JSONMultipleTrans = []
 	try {
 		var fs = require('fs');
 		const content = fs.readFileSync(FilePath, { encoding: 'utf8', flag: 'r' });
@@ -135,6 +137,7 @@ function WriteJSONPeviousTrans(linetext, JSONTrans, LastSourceText) {
 			const NewTargetText = linetext.replace(RexRemoveLabels, GetTranslationText);
 			const SubstituteTranslation = (JSONSource) && (NewTargetText != '') && (NewTargetText != LastSourceText);
 			if (SubstituteTranslation) {
+				WriteMultipleTrans(JSONSource, NewTargetText);
 				JSONSource.target = NewTargetText;
 			}
 		}
@@ -162,7 +165,7 @@ function WriteJSONTrans(linetext, JSONTrans, LastSourceText) {
 	if (linetext.match('<target>')) {
 		var JSONSource = JSONTrans.find(Obj => Obj.source == LastSourceText);
 		JSONSource.target = linetext.replace(RexRemoveLabels, GetTranslationText);
-	}	
+	}
 	processUnitTransExclusion(JSONTrans, linetext, LastSourceText);
 	return (LastSourceText);
 }
@@ -228,6 +231,7 @@ function SaveJSONTransfile(JSONTrans) {
 	DeleteJSONTransFile();
 	const JSONFileURI = GetFullPathFileJSONS();
 	fs.writeFileSync(JSONFileURI.fsPath, JSON.stringify(JSONTrans));
+	SaveMultipleTransFile();
 }
 async function SaveTranslationToJsonAndCreateTranslationXlf() {
 	await SaveTranslationToJson();
@@ -361,25 +365,25 @@ function NewFileFolderExists(fileName = '') {
 	}
 	return true;
 }
-function processUnitTransExclusion(JSONTrans, line = '', LastSourceText = '') {		
+function processUnitTransExclusion(JSONTrans, line = '', LastSourceText = '') {
 	if (line.search(/<\/trans-unit>/i) <= -1) {
 		return;
-	};	
+	};
 	let ExcludeUnitTrans = 'N';
 	for (let index = 0; index < unitTrans.length; index++) {
-		const element = unitTrans[index];		
+		const element = unitTrans[index];
 		if (MatchAnyExclusion(element)) {
-			ExcludeUnitTrans = 'Y';			
-		}		
+			ExcludeUnitTrans = 'Y';
+		}
 	}
 	UpdateExcludeCsv(unitTrans, ExcludeUnitTrans, JSONTrans, LastSourceText);
 	unitTrans = [];
 }
 //funtion that take string and try to match it with an regexp array
-function MatchAnyExclusion(fileLine) {	
+function MatchAnyExclusion(fileLine) {
 	if (!Exclusions) { return false; }
 
-	for (let index = 0; index < Exclusions.length; index++) {		
+	for (let index = 0; index < Exclusions.length; index++) {
 		const element = Exclusions[index];
 		if (fileLine.search(RegExp(element, 'gi')) > -1) {
 			return true;
@@ -388,13 +392,13 @@ function MatchAnyExclusion(fileLine) {
 	return false;
 }
 function SetExclusions(translateSteps) {
-	Exclusions = []	
-		if (translateSteps.ExclusionsFromManual) {
-			Exclusions = translateSteps.ExclusionsFromManual;
-		}			
+	Exclusions = []
+	if (translateSteps.ExclusionsFromManual) {
+		Exclusions = translateSteps.ExclusionsFromManual;
+	}
 }
 function UpdateExcludeCsv(unitTrans, ExcludeUnitTrans, JSONTrans, LastSourceText) {
-	var JSONSource = JSONTrans.find(Obj => Obj.source == LastSourceText);	
+	var JSONSource = JSONTrans.find(Obj => Obj.source == LastSourceText);
 	if (JSONSource) {
 		if (JSONSource.ExcludeTransFromCSV !== 'N') {
 			JSONSource.ExcludeTransFromCSV = ExcludeUnitTrans;
@@ -409,4 +413,52 @@ function getSplitLineChar(content = '') {
 		return '\n';
 	}
 	return '';
+}
+function WriteMultipleTrans(JSONSource, NewTargetText = '') {
+	if (JSONSource.target == '') {
+		return;
+	}
+	if (JSONSource.target == JSONSource.source) {
+		return;
+	}
+	if (JSONSource.target == NewTargetText) {
+		return;
+	}
+	var existingJSON = JSONMultipleTrans.find(Obj => Obj.source == JSONSource.source &&
+		Obj.prevTarget == JSONSource.target &&
+		Obj.newTarget == NewTargetText);
+	if (!existingJSON) {
+		var existingJSON = JSONMultipleTrans.find(Obj => Obj.source == JSONSource.source &&
+			Obj.prevTarget == NewTargetText &&
+			Obj.newTarget == JSONSource.target);
+
+	}
+	if (existingJSON) {
+		if (existingJSON.source == JSONSource.source) {
+			return;
+		}
+	}
+	const multipleTrans = {
+		"source": JSONSource.source,
+		"prevTarget": JSONSource.target,
+		"newTarget": NewTargetText
+	}
+	JSONMultipleTrans.push(multipleTrans);
+}
+function SaveMultipleTransFile() {
+	try {
+		const fs = require('fs');
+		const JSONFileURI = vscode.Uri.file(vscode.workspace.workspaceFolders[0].uri.path + '/.vscode/MultipleTrans.json');
+		if (fs.existsSync(JSONFileURI.fsPath)) {
+			fs.unlinkSync(JSONFileURI.fsPath);
+		}
+		if (JSONMultipleTrans.length == 0) {
+			return;
+		}
+		vscode.window.showErrorMessage('There are multiple translations for any source. See them in file:' + JSONFileURI.toString());
+		fs.writeFileSync(JSONFileURI.fsPath, JSON.stringify(JSONMultipleTrans));
+	}
+	catch (err) {
+		vscode.window.showInformationMessage('Error in ProcessXlfFilePreviousTrans:' + err.message);
+	}
 }

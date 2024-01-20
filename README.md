@@ -99,15 +99,18 @@ You can exclude some translations from the process, for example, if you don´t w
 With command F2 “JAM Edit remaining translations with HTML view” you can edit the remaining translations in a HTML view. You can see the remaining captions in the source language, and you can edit the captions in the target language. With save button you can save the changes in the target language. App will display a file dialog to select your json translation steps file.
 You can set your styyle for HTML with configutation parameter "CSSHTMLTableView". Other way you have a default table style.
 
+### Detect multiple translations for then same source
+
+If in the previous translations the process detects the same source with multiple translations to target language, it warns you with a message and leaves all these translations in a file called MultipleTrans.json, for review purposes.
+
 ## Features
 
 For this purpose, you only have to create a new .json file (Ctrl+N and save as any name with json extension in the workspace folder) and type new snippet JAMCreatetransfile.
 
 
-
 ## Requirements
 
-Visual Studio with AL language.
+Visual Studio ONLY.
 
 ## Extension Settings
 
@@ -124,37 +127,3 @@ Remember don´t use in the .json file “\” patch separator use “/” instea
 ## Release Notes
 
 Initial release
-
-### 1.0.0
-
-Initial release
-
-### 1.0.3
-
-Take first previous final translation and after other previous translations
-
-### 1.0.4
-
-If editor is not in a translation step file open a dialog to pick one, to allow launching process out of trans steps edition.
-
-Icon from https://upload.wikimedia.org/wikipedia/commons/1/14/Google_Translate_logo_%28old%29.png 
-
-### 1.0.5
-
-Check and raise error if files or folders not exists
-
-### 1.0.6
-
-Exclusions from manual process feature
-
-### 1.0.7
-
-Error when carrige return is only /n instead of /r/n.
-
-### 1.0.8
-
-HTML view for remaining translations editting. Set your own CSS for this purpose.
-
-### 1.0.9
-
-New command "JAM Create a CSV file with all workspace translations".

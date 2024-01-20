@@ -34,12 +34,14 @@ async function executeTransSteps() {
 		OutputChannel.appendLine(translateSteps.OriginalXlfFile[1].Path + ' file processed.');
 	};
 	if (!translateSteps.PreviousTranslationsFiles[0].SkipStep) {
-		const previousTrans = translateSteps.PreviousTranslationsFiles[1].Files;
-		for (let index = 0; index < previousTrans.length; index++) {
-			CheckFileExists(previousTrans[index].Path);
-			OutputChannel.appendLine('Loading prev trans ' + previousTrans[index].Path);
-			await translation.ProcessXlfFilePreviousTrans(previousTrans[index].Path);
-			OutputChannel.appendLine(previousTrans[index].Path + ' file processed.');
+		if (translateSteps.PreviousTranslationsFiles[1]) {
+			const previousTrans = translateSteps.PreviousTranslationsFiles[1].Files;
+			for (let index = 0; index < previousTrans.length; index++) {
+				CheckFileExists(previousTrans[index].Path);
+				OutputChannel.appendLine('Loading prev trans ' + previousTrans[index].Path);
+				await translation.ProcessXlfFilePreviousTrans(previousTrans[index].Path);
+				OutputChannel.appendLine(previousTrans[index].Path + ' file processed.');
+			}
 		}
 	}
 	if (!translateSteps.RemainigTranslationsFile[0].SkipStep) {
@@ -54,14 +56,14 @@ async function executeTransSteps() {
 	}
 }
 async function getTransStepsJSON() {
-	var currEditor = vscode.window.activeTextEditor;	
+	var currEditor = vscode.window.activeTextEditor;
 	let CurrDoc = {};
-	if (currEditor) {CurrDoc = currEditor.document;
-	if (CurrDoc.fileName.search('.json') < 0)
-	{
-		CurrDoc = await OpenAnotherDoc();
+	if (currEditor) {
+		CurrDoc = currEditor.document;
+		if (CurrDoc.fileName.search('.json') < 0) {
+			CurrDoc = await OpenAnotherDoc();
+		}
 	}
- }
 	else {
 		CurrDoc = await OpenAnotherDoc();
 	}
@@ -82,8 +84,8 @@ async function CreateRemainingTransFile(RemTransFileName = '') {
 	for (var i = 0; i < JSONTrans.length; i++) {
 		var element = JSONTrans[i];
 		if (element.source) {
-			let WriteCSVLine = ((element.target == '') || (element.target == element.source)) 
-				&& (element.ExcludeTransFromCSV  !== 'Y');
+			let WriteCSVLine = ((element.target == '') || (element.target == element.source))
+				&& (element.ExcludeTransFromCSV !== 'Y');
 			if (WriteCSVLine) {
 				LineText = LineText + element.source + HorTab + element.source + carriage;
 			}
